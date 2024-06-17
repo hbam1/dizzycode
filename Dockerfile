@@ -4,7 +4,7 @@ RUN apk update && apk add --no-cache git
 
 WORKDIR /home/
 
-ARG REPO_URL=https://github.com/hbam1/side-project.git
+ARG REPO_URL=https://github.com/hbam1/dizzycode.git
 RUN git clone ${REPO_URL} app
 
 WORKDIR /home/app/
