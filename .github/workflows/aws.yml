@@ -27,7 +27,7 @@ jobs:
         USER: ${{ secrets.AWS_EC2_USER }}
       run: |
         ssh -o StrictHostKeyChecking=no $USER@$HOST << 'EOF'
-          cd /
+          cd /home/ubuntu
           docker-compose down
           docker-compose up -d
         EOF
