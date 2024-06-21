@@ -21,7 +21,7 @@ public class RoomController {
 
     private final RoomService roomService;
 
-    @GetMapping("/test")
+    @GetMapping("/test1234")
     public String test() {
         return "test";
     }
