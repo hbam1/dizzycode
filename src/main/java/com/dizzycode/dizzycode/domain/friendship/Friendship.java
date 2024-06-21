@@ -22,12 +22,12 @@ public class Friendship {
 
     @ManyToOne
     @MapsId("memberId1")
-    @JoinColumn(name = "member_id1", insertable = false, updatable = false)
+    @JoinColumn(name = "member_id1", updatable = false)
     private Member member1;
 
     @ManyToOne
     @MapsId("memberId2")
-    @JoinColumn(name = "member_id2", insertable = false, updatable = false)
+    @JoinColumn(name = "member_id2", updatable = false)
     private Member member2;
 
     public enum FriendshipStatus {

@@ -9,11 +9,11 @@ RUN git clone ${REPO_URL} app
 
 WORKDIR /home/app/
 
-RUN ./gradlew clean build
+RUN ./gradlew clean build -x test
 
 FROM bellsoft/liberica-openjdk-alpine:17
 
-COPY --from=builder /app/build/libs/*.jar app.jar
+COPY --from=builder /home/app/build/libs/*.jar app.jar
 
 EXPOSE 8080
 

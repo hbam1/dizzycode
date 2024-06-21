@@ -16,4 +16,17 @@ public class RoomMember {
 
     @EmbeddedId
     private RoomMemberId roomMemberId;
+
+    @ManyToOne
+    @MapsId("memberId")
+    @JoinColumn(name = "member_id", updatable = false)
+    private Member member;
+
+    @ManyToOne
+    @MapsId("roomId")
+    @JoinColumn(name = "room_id", updatable = false)
+    private Room room;
+
+    @Column(nullable = false)
+    private boolean manager = false;
 }
