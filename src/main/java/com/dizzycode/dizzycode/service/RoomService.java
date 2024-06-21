@@ -20,7 +20,6 @@ import java.util.List;
 public class RoomService {
 
     private final RoomRepository roomRepository;
-    private final RoomMember roomMember;
     private final MemberRepository memberRepository;
 
     public Room createRoom(RoomCreateDTO roomCreateDTO) {
