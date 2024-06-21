@@ -26,12 +26,12 @@ public class RoomController {
         return new ResponseEntity<>(roomService.createRoom(roomCreateDTO), HttpStatus.CREATED);
     }
 
-    @GetMapping
-    public ResponseEntity<List<Room>> roomList() {
-        // 현재 인증된 사용자의 인증 객체
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        String email = authentication.getName();
-        return new ResponseEntity<>(roomService.roomList(email), HttpStatus.OK);
-    }
+//    @GetMapping
+//    public ResponseEntity<List<Room>> roomList() {
+//        // 현재 인증된 사용자의 인증 객체
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//
+//        String email = authentication.getName();
+//        return new ResponseEntity<>(roomService.roomList(email), HttpStatus.OK);
+//    }
 }
