@@ -21,6 +21,11 @@ public class RoomController {
 
     private final RoomService roomService;
 
+    @GetMapping("/test")
+    public String test() {
+        return "test";
+    }
+
     @PostMapping("/rooms")
     public ResponseEntity<Room> createRoom(RoomCreateDTO roomCreateDTO) {
 
