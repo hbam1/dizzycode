@@ -5,8 +5,9 @@ import com.dizzycode.dizzycode.domain.HelloMessage;
 import com.dizzycode.dizzycode.domain.Message;
 import com.dizzycode.dizzycode.service.MessageService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.util.HtmlUtils;
 
@@ -15,10 +16,13 @@ import org.springframework.web.util.HtmlUtils;
 public class GreetingController {
 
     private final MessageService messageService;
+    private final SimpMessagingTemplate messagingTemplate;
 
-    @MessageMapping("/hello")
-    @SendTo("/topic/greetings")
-    public Greeting greeting(HelloMessage message) throws Exception {
+    @MessageMapping("/rooms/{roomId}/categories/{categoryId}/channels/{channelId}")
+    public Greeting greeting(@DestinationVariable String roomId,
+                             @DestinationVariable String categoryId,
+                             @DestinationVariable String channelId,
+                             HelloMessage message) throws Exception {
         Thread.sleep(1000); // simulated delay
 
         Message message1 = new Message();
@@ -28,6 +32,16 @@ public class GreetingController {
         message1.setContent("aa");
         message1.setImageUrl("");
         messageService.saveMessage(message1);
+
+        Greeting greeting = new Greeting("Hello, " + HtmlUtils.htmlEscape(message.getName()) + "!");
+
+
+        // Send the message to the room topic
+        messagingTemplate.convertAndSend("/topic/rooms/" + roomId, greeting);
+
+        // Send the message to the channel topic
+        messagingTemplate.convertAndSend("/topic/rooms/" + roomId + "/categories/" + categoryId + "/channels/" + channelId, greeting);
+
 
         return new Greeting("Hello, " + HtmlUtils.htmlEscape(message.getName()) + "!");
     }
