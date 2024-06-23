@@ -59,8 +59,9 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         //유저 정보
         String[] memberInfo = authentication.getName().split(" ");
-        String email = memberInfo[0];
-        String username = memberInfo[1];
+        Long id = Long.parseLong(memberInfo[0]);
+        String email = memberInfo[1];
+        String username = memberInfo[2];
 
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
@@ -74,9 +75,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
         valueOperations.set(refresh, email, 86400000L, TimeUnit.MILLISECONDS);
 
-
-
         MemberDetailDTO memberDetailDTO = new MemberDetailDTO();
+        memberDetailDTO.setId(id);
         memberDetailDTO.setEmail(email);
         memberDetailDTO.setUsername(username);
 

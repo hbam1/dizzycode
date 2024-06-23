@@ -67,7 +67,8 @@ public class RoomService {
 
     private Member getMemberFromSession() {
         // 현재 인증된 사용자의 인증 객체를 가져옴
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        String[] memberInfo = SecurityContextHolder.getContext().getAuthentication().getName().split(" ");
+        String email = memberInfo[1];
 
         return memberRepository.findByEmail(email);
     }

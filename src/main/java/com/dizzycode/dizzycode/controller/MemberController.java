@@ -32,6 +32,7 @@ public class MemberController {
         Member member = memberService.signUp(memberSignupDTO);
 
         MemberDetailDTO memberDetailDTO = new MemberDetailDTO();
+        memberDetailDTO.setId(member.getId());
         memberDetailDTO.setEmail(member.getEmail());
         memberDetailDTO.setUsername(member.getUsername());
 
