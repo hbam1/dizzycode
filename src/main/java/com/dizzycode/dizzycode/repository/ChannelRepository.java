@@ -1,6 +1,5 @@
 package com.dizzycode.dizzycode.repository;
 
-import com.dizzycode.dizzycode.domain.Category;
 import com.dizzycode.dizzycode.domain.Channel;
 import com.dizzycode.dizzycode.domain.Room;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,6 +9,6 @@ import java.util.List;
 
 @Repository
 public interface ChannelRepository extends JpaRepository<Channel, Long> {
-    List<Channel> findChannelsByCategory(Category category);
+    List<Channel> findChannelsByRoom(Room room);
     Channel findChannelByChannelId(Long channelId);
 }

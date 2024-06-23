@@ -8,6 +8,6 @@ import lombok.Setter;
 public class ChannelDetailDTO {
 
     private Long channelId;
-    private Long categoryId;
+    private Long roomId;
     private String channelName;
 }

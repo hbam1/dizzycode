@@ -14,8 +14,8 @@ public class Channel {
     private Long channelId;
 
     @ManyToOne
-    @JoinColumn(name = "category_id", nullable = false)
-    private Category category;
+    @JoinColumn(name = "room_id", nullable = false)
+    private Room room;
 
     @Column(nullable = false)
     private String channelName;
