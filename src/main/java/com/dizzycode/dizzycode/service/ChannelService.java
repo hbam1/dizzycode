@@ -1,9 +1,11 @@
 package com.dizzycode.dizzycode.service;
 
+import com.dizzycode.dizzycode.domain.Category;
 import com.dizzycode.dizzycode.domain.Channel;
 import com.dizzycode.dizzycode.domain.Room;
 import com.dizzycode.dizzycode.dto.channel.ChannelCreateDTO;
 import com.dizzycode.dizzycode.dto.channel.ChannelDetailDTO;
+import com.dizzycode.dizzycode.repository.CategoryRepository;
 import com.dizzycode.dizzycode.repository.ChannelRepository;
 import com.dizzycode.dizzycode.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,14 +21,14 @@ import java.util.stream.Collectors;
 public class ChannelService {
 
     private final ChannelRepository channelRepository;
-    private final RoomRepository roomRepository;
+    private final CategoryRepository categoryRepository;
 
-    public ChannelDetailDTO createChannel(Long roomId, ChannelCreateDTO channelCreateDTO) {
+    public ChannelDetailDTO createChannel(Long categoryId, ChannelCreateDTO channelCreateDTO) {
 
-        Room room = roomRepository.findByRoomId(roomId);
+        Category category = categoryRepository.findCategoryByCategoryId(categoryId);
 
         Channel channel = new Channel();
-        channel.setRoom(room);
+        channel.setCategory(category);
         channel.setChannelName(channelCreateDTO.getChannelName());
 
         channel = channelRepository.save(channel);
@@ -34,21 +36,21 @@ public class ChannelService {
         ChannelDetailDTO channelDetailDTO = new ChannelDetailDTO();
         channelDetailDTO.setChannelId(channel.getChannelId());
         channelDetailDTO.setChannelName(channel.getChannelName());
-        channelDetailDTO.setRoomId(channel.getRoom().getRoomId());
+        channelDetailDTO.setCategoryId(channel.getCategory().getCategoryID());
 
         return channelDetailDTO;
     }
 
-    public List<ChannelDetailDTO> channelList(Long roomId) {
+    public List<ChannelDetailDTO> channelList(Long categoryId) {
 
-        Room room = roomRepository.findByRoomId(roomId);
+        Category category = categoryRepository.findCategoryByCategoryId(categoryId);
 
-        List<ChannelDetailDTO> channelDTOs = channelRepository.findChannelsByRoom(room).stream()
+        List<ChannelDetailDTO> channelDTOs = channelRepository.findChannelsByCategory(category).stream()
                 .map(channel -> {
                     ChannelDetailDTO channelDetailDTO = new ChannelDetailDTO();
                     channelDetailDTO.setChannelId(channel.getChannelId());
                     channelDetailDTO.setChannelName(channel.getChannelName());
-                    channelDetailDTO.setRoomId(roomId);
+                    channelDetailDTO.setCategoryId(categoryId);
                     return channelDetailDTO;
                 })
                 .collect(Collectors.toList());
@@ -56,10 +58,10 @@ public class ChannelService {
         return channelDTOs;
     }
 
-    public ChannelDetailDTO channelRetrieve(Long roomId, Long channelId) {
+    public ChannelDetailDTO channelRetrieve(Long categoryId, Long channelId) {
         Channel channel = channelRepository.findChannelByChannelId(channelId);
         ChannelDetailDTO channelDetailDTO = new ChannelDetailDTO();
-        channelDetailDTO.setRoomId(roomId);
+        channelDetailDTO.setCategoryId(categoryId);
         channelDetailDTO.setChannelId(channel.getChannelId());
         channelDetailDTO.setChannelName(channel.getChannelName());
 

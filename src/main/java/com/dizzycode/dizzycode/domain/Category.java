@@ -5,18 +5,20 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Setter @Getter
-@Table(name = "channels")
-public class Channel {
+@Getter
+@Setter
+@Table(name="categories")
+public class Category {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long channelId;
+    private long categoryID;
 
     @ManyToOne
-    @JoinColumn(name = "category_id", nullable = false)
-    private Category category;
+    @JoinColumn(name = "room_id", nullable = false)
+    private Room room;
 
     @Column(nullable = false)
-    private String channelName;
+    private String categoryName;
+
 }
