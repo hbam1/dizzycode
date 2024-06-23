@@ -1,6 +1,8 @@
 package com.dizzycode.dizzycode.service.jwt;
 
 
+import com.dizzycode.dizzycode.dto.member.MemberDetailDTO;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.Cookie;
@@ -53,10 +55,12 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     //로그인 성공시 실행하는 메소드 (여기서 JWT를 발급하면 됨)
     @Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) {
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException {
 
         //유저 정보
-        String email = authentication.getName();
+        String[] memberInfo = authentication.getName().split(" ");
+        String email = memberInfo[0];
+        String username = memberInfo[1];
 
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
@@ -70,9 +74,21 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
         valueOperations.set(refresh, email, 86400000L, TimeUnit.MILLISECONDS);
 
+
+
+        MemberDetailDTO memberDetailDTO = new MemberDetailDTO();
+        memberDetailDTO.setEmail(email);
+        memberDetailDTO.setUsername(username);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonResponse = objectMapper.writeValueAsString(memberDetailDTO);
+
         //응답 설정
         response.setHeader("Authorization", "Bearer " + access);
         response.addCookie(createCookie("refresh", refresh));
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(jsonResponse);
         response.setStatus(HttpStatus.OK.value());
     }
 
