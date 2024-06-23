@@ -9,5 +9,4 @@ public class DizzycodeApplication {
     public static void main(String[] args) {
         SpringApplication.run(DizzycodeApplication.class, args);
     }
-
 }
