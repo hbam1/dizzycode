@@ -3,7 +3,9 @@ package com.dizzycode.dizzycode.service;
 import com.dizzycode.dizzycode.domain.*;
 import com.dizzycode.dizzycode.dto.category.CategoryCreateDTO;
 import com.dizzycode.dizzycode.dto.category.CategoryDetailDTO;
+import com.dizzycode.dizzycode.dto.channel.ChannelDetailDTO;
 import com.dizzycode.dizzycode.repository.CategoryRepository;
+import com.dizzycode.dizzycode.repository.ChannelRepository;
 import com.dizzycode.dizzycode.repository.RoomRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final RoomRepository roomRepository;
+    private final ChannelRepository channelRepository;
 
     public CategoryDetailDTO createCategory(Long roomId, CategoryCreateDTO categoryCreateDTO) {
 
@@ -48,6 +51,19 @@ public class CategoryService {
                     categoryDetailDTO.setCategoryName(category.getCategoryName());
                     categoryDetailDTO.setRoomId(category.getRoom().getRoomId());
                     categoryDetailDTO.setCategoryId(category.getCategoryId());
+
+                    List<ChannelDetailDTO> channelDetailDTOs = channelRepository.findChannelsByCategory(category).stream()
+                                    .map(channel -> {
+
+                                        ChannelDetailDTO channelDetailDTO = new ChannelDetailDTO();
+                                        channelDetailDTO.setCategoryId(category.getCategoryId());
+                                        channelDetailDTO.setChannelId(channel.getChannelId());
+                                        channelDetailDTO.setChannelName(channel.getChannelName());
+
+                                        return channelDetailDTO;
+                                    }).toList();
+
+                    categoryDetailDTO.setChannelDetailDTOs(channelDetailDTOs);
                     return categoryDetailDTO;
                 }).toList();
 
@@ -57,10 +73,22 @@ public class CategoryService {
     public CategoryDetailDTO categoryRetrieve(Long roomId, Long categoryId) {
 
         Category category = categoryRepository.findCategoryByCategoryId(categoryId);
+        List<ChannelDetailDTO> channelDetailDTOs = channelRepository.findChannelsByCategory(category).stream()
+                .map(channel -> {
+
+                    ChannelDetailDTO channelDetailDTO = new ChannelDetailDTO();
+                    channelDetailDTO.setCategoryId(category.getCategoryId());
+                    channelDetailDTO.setChannelId(channel.getChannelId());
+                    channelDetailDTO.setChannelName(channel.getChannelName());
+
+                    return channelDetailDTO;
+                }).toList();
+
         CategoryDetailDTO categoryDetailDTO = new CategoryDetailDTO();
         categoryDetailDTO.setCategoryId(category.getCategoryId());
         categoryDetailDTO.setCategoryName(category.getCategoryName());
         categoryDetailDTO.setRoomId(roomId);
+        categoryDetailDTO.setChannelDetailDTOs(channelDetailDTOs);
 
         return categoryDetailDTO;
     }
