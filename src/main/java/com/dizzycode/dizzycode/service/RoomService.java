@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +29,7 @@ public class RoomService {
     private final MemberRepository memberRepository;
     private final RoomMemberRepository roomMemberRepository;
 
-    public Room createRoom(RoomCreateDTO roomCreateDTO) {
+    public RoomDetailDTO createRoom(RoomCreateDTO roomCreateDTO) {
         // 현재 인증된 사용자의 인증 객체를 가져옵니다.
         Member member = getMemberFromSession();
 
@@ -46,18 +47,35 @@ public class RoomService {
         roomMember.setManager(true);
         roomMemberRepository.save(roomMember);
 
-        return room;
+        RoomDetailDTO roomDetailDTO = new RoomDetailDTO();
+        roomDetailDTO.setRoomId(room.getRoomId());
+        roomDetailDTO.setRoomName(room.getRoomName());
+
+        return roomDetailDTO;
     }
 
-    public List<Room> roomList() {
+    public List<RoomDetailDTO> roomList() {
         Member member = getMemberFromSession();
 
-        List<Room> rooms = roomMemberRepository.findRoomsByMemberId(member.getId());
+        List<RoomDetailDTO> rooms = roomMemberRepository.findRoomsByMemberId(member.getId()).stream()
+                .map(room -> {
+                    RoomDetailDTO roomDetailDTO = new RoomDetailDTO();
+                    roomDetailDTO.setRoomId(room.getRoomId());
+                    roomDetailDTO.setRoomName(room.getRoomName());
+
+                    return roomDetailDTO;
+                })
+                .collect(Collectors.toList());
+
         return rooms;
     }
 
-    public RoomDetailDTO roomRetrieve(Long roomId) {
+    public RoomDetailDTO roomRetrieve(Long roomId) throws ClassNotFoundException {
         Room room = roomRepository.findByRoomId(roomId);
+
+        if (room == null) {
+            throw new ClassNotFoundException("방이 존재하지 않습니다.");
+        }
 
         RoomDetailDTO roomDetailDTO = new RoomDetailDTO();
         roomDetailDTO.setRoomId(roomId);

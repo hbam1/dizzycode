@@ -1,6 +1,5 @@
 package com.dizzycode.dizzycode.controller;
 
-import com.dizzycode.dizzycode.domain.Room;
 import com.dizzycode.dizzycode.dto.room.RoomCreateDTO;
 import com.dizzycode.dizzycode.dto.room.RoomDetailDTO;
 import com.dizzycode.dizzycode.dto.room.RoomRemoveDTO;
@@ -21,19 +20,19 @@ public class RoomController {
     private final RoomService roomService;
 
     @PostMapping("/rooms")
-    public ResponseEntity<Room> createRoom(@RequestBody RoomCreateDTO roomCreateDTO) {
+    public ResponseEntity<RoomDetailDTO> createRoom(@RequestBody RoomCreateDTO roomCreateDTO) {
 
         return new ResponseEntity<>(roomService.createRoom(roomCreateDTO), HttpStatus.CREATED);
     }
 
     @GetMapping("/rooms")
-    public ResponseEntity<List<Room>> roomList() {
+    public ResponseEntity<List<RoomDetailDTO>> roomList() {
 
         return new ResponseEntity<>(roomService.roomList(), HttpStatus.OK);
     }
 
     @GetMapping("/rooms/{roomId}")
-    public ResponseEntity<RoomDetailDTO> roomRetrieve(@PathVariable Long roomId) {
+    public ResponseEntity<RoomDetailDTO> roomRetrieve(@PathVariable Long roomId) throws ClassNotFoundException {
 
         return new ResponseEntity<>(roomService.roomRetrieve(roomId), HttpStatus.OK);
     }
