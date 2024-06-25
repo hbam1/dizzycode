@@ -3,13 +3,12 @@ package com.dizzycode.dizzycode.controller;
 import com.dizzycode.dizzycode.domain.Room;
 import com.dizzycode.dizzycode.dto.room.RoomCreateDTO;
 import com.dizzycode.dizzycode.dto.room.RoomDetailDTO;
+import com.dizzycode.dizzycode.dto.room.RoomRemoveDTO;
 import com.dizzycode.dizzycode.service.RoomService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,5 +36,11 @@ public class RoomController {
     public ResponseEntity<RoomDetailDTO> roomRetrieve(@PathVariable Long roomId) {
 
         return new ResponseEntity<>(roomService.roomRetrieve(roomId), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/rooms/{roomId}")
+    public ResponseEntity<RoomRemoveDTO> roomRemove(@PathVariable Long roomId) throws ClassNotFoundException {
+
+        return new ResponseEntity<>(roomService.roomRemove(roomId), HttpStatus.NO_CONTENT);
     }
 }

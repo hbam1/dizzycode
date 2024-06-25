@@ -3,14 +3,13 @@ package com.dizzycode.dizzycode.controller;
 import com.dizzycode.dizzycode.domain.Member;
 import com.dizzycode.dizzycode.dto.member.MemberDetailDTO;
 import com.dizzycode.dizzycode.dto.member.MemberSignupDTO;
+import com.dizzycode.dizzycode.dto.room.RoomRemoveDTO;
 import com.dizzycode.dizzycode.exception.member.ExistMemberException;
 import com.dizzycode.dizzycode.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor

@@ -6,6 +6,7 @@ import com.dizzycode.dizzycode.domain.roommember.RoomMember;
 import com.dizzycode.dizzycode.domain.roommember.RoomMemberId;
 import com.dizzycode.dizzycode.dto.room.RoomCreateDTO;
 import com.dizzycode.dizzycode.dto.room.RoomDetailDTO;
+import com.dizzycode.dizzycode.dto.room.RoomRemoveDTO;
 import com.dizzycode.dizzycode.repository.MemberRepository;
 import com.dizzycode.dizzycode.repository.RoomMemberRepository;
 import com.dizzycode.dizzycode.repository.RoomRepository;
@@ -63,6 +64,19 @@ public class RoomService {
         roomDetailDTO.setRoomName(room.getRoomName());
 
         return roomDetailDTO;
+    }
+
+    public RoomRemoveDTO roomRemove(Long roomId) throws ClassNotFoundException {
+        Room room = roomRepository.findByRoomId(roomId);
+
+        if (room == null) {
+            throw new ClassNotFoundException("방이 존재하지 않습니다.");
+        }
+
+        roomRepository.delete(room);
+        RoomRemoveDTO roomRemoveDTO = new RoomRemoveDTO();
+        roomRemoveDTO.setMessage("방을 삭제했습니다");
+        return roomRemoveDTO;
     }
 
     private Member getMemberFromSession() {

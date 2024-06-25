@@ -16,19 +16,19 @@ public class ChannelController {
 
     private final ChannelService channelService;
 
-    @PostMapping("/rooms/{categoryId}/channels")
+    @PostMapping("/rooms/{roomId}/categories/{categoryId}/channels")
     public ResponseEntity<ChannelDetailDTO> createChannel(@RequestBody ChannelCreateDTO channelCreateDTO, @PathVariable Long categoryId) {
 
         return new ResponseEntity<>(channelService.createChannel(categoryId, channelCreateDTO), HttpStatus.CREATED);
     }
 
-    @GetMapping("/rooms/{categoryId}/channels")
+    @GetMapping("/rooms/{roomId}/categories/{categoryId}/channels")
     public ResponseEntity<List<ChannelDetailDTO>> channelList(@PathVariable Long categoryId) {
 
         return new ResponseEntity<>(channelService.channelList(categoryId), HttpStatus.OK);
     }
 
-    @GetMapping("/rooms/{categoryId}/channels/{channelId}")
+    @GetMapping("/rooms/{roomId}/categories/{categoryId}/channels/{channelId}")
     public ResponseEntity<ChannelDetailDTO> channelRetrieve(@PathVariable Long channelId, @PathVariable Long categoryId) {
 
         return new ResponseEntity<>(channelService.channelRetrieve(categoryId, channelId), HttpStatus.OK);
