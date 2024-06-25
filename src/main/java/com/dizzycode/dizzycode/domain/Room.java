@@ -19,4 +19,7 @@ public class Room {
 
     @Column(nullable = false)
     private String roomName;
+
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<RoomMember> roomMembers;
 }

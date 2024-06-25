@@ -22,7 +22,7 @@ public class RoomMember {
     @JoinColumn(name = "member_id", updatable = false)
     private Member member;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @MapsId("roomId")
     @JoinColumn(name = "room_id", updatable = false)
     private Room room;
