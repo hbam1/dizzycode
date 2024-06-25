@@ -8,10 +8,9 @@ import java.util.List;
 
 @Getter
 @Setter
-public class CategoryDetailDTO {
+public class CategoryPostResponseDTO {
 
     private Long categoryId;
     private Long roomId;
     private String categoryName;
-    private List<ChannelDetailDTO> channels;
 }
