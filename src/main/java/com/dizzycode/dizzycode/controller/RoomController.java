@@ -1,6 +1,7 @@
 package com.dizzycode.dizzycode.controller;
 
 import com.dizzycode.dizzycode.dto.room.RoomCreateDTO;
+import com.dizzycode.dizzycode.dto.room.RoomCreateWithCCDTO;
 import com.dizzycode.dizzycode.dto.room.RoomDetailDTO;
 import com.dizzycode.dizzycode.dto.room.RoomRemoveDTO;
 import com.dizzycode.dizzycode.service.RoomService;
@@ -20,7 +21,7 @@ public class RoomController {
     private final RoomService roomService;
 
     @PostMapping("/rooms")
-    public ResponseEntity<RoomDetailDTO> createRoom(@RequestBody RoomCreateDTO roomCreateDTO) {
+    public ResponseEntity<RoomCreateWithCCDTO> createRoom(@RequestBody RoomCreateDTO roomCreateDTO) {
 
         return new ResponseEntity<>(roomService.createRoom(roomCreateDTO), HttpStatus.CREATED);
     }

@@ -1,21 +1,23 @@
 package com.dizzycode.dizzycode.service;
 
+import com.dizzycode.dizzycode.domain.Category;
+import com.dizzycode.dizzycode.domain.Channel;
 import com.dizzycode.dizzycode.domain.Member;
 import com.dizzycode.dizzycode.domain.Room;
 import com.dizzycode.dizzycode.domain.roommember.RoomMember;
 import com.dizzycode.dizzycode.domain.roommember.RoomMemberId;
 import com.dizzycode.dizzycode.dto.room.RoomCreateDTO;
+import com.dizzycode.dizzycode.dto.room.RoomCreateWithCCDTO;
 import com.dizzycode.dizzycode.dto.room.RoomDetailDTO;
 import com.dizzycode.dizzycode.dto.room.RoomRemoveDTO;
-import com.dizzycode.dizzycode.repository.MemberRepository;
-import com.dizzycode.dizzycode.repository.RoomMemberRepository;
-import com.dizzycode.dizzycode.repository.RoomRepository;
+import com.dizzycode.dizzycode.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,9 +30,11 @@ public class RoomService {
     private final RoomRepository roomRepository;
     private final MemberRepository memberRepository;
     private final RoomMemberRepository roomMemberRepository;
+    private final CategoryRepository categoryRepository;
+    private final ChannelRepository channelRepository;
 
-    public RoomDetailDTO createRoom(RoomCreateDTO roomCreateDTO) {
-        // 현재 인증된 사용자의 인증 객체를 가져옵니다.
+    public RoomCreateWithCCDTO createRoom(RoomCreateDTO roomCreateDTO) {
+        // 현재 인증된 사용자의 인증 객체
         Member member = getMemberFromSession();
 
         // 방 생성
@@ -47,11 +51,61 @@ public class RoomService {
         roomMember.setManager(true);
         roomMemberRepository.save(roomMember);
 
-        RoomDetailDTO roomDetailDTO = new RoomDetailDTO();
-        roomDetailDTO.setRoomId(room.getRoomId());
-        roomDetailDTO.setRoomName(room.getRoomName());
+        // 카테고리 및 채널 기본 생성 (채팅 카테고리와 음성 카테고리 기본 생성 및 각 카테고리 별 일반 채널 기본 생성)
+        Category category1 = new Category();
+        category1.setRoom(room);
+        category1.setCategoryName("채팅 채널");
+        category1 = categoryRepository.save(category1);
 
-        return roomDetailDTO;
+        Category category2 = new Category();
+        category2.setRoom(room);
+        category2.setCategoryName("음성 채널");
+        category2 = categoryRepository.save(category2);
+
+        Channel channel1 = new Channel();
+        channel1.setCategory(category1);
+        channel1.setChannelName("일반");
+        channelRepository.save(channel1);
+
+        Channel channel2 = new Channel();
+        channel2.setCategory(category2);
+        channel2.setChannelName("일반");
+        channelRepository.save(channel2);
+
+        // 반환 DTO
+        // 방 객체
+        RoomCreateWithCCDTO roomCreateWithCCDTO = new RoomCreateWithCCDTO();
+        roomCreateWithCCDTO.setRoomId(room.getRoomId());
+        roomCreateWithCCDTO.setRoomName(room.getRoomName());
+
+        // 채팅 채널 카테고리
+        RoomCreateWithCCDTO.Category categoryDTO1 = new RoomCreateWithCCDTO.Category();
+        categoryDTO1.setCategoryId(category1.getCategoryId());
+        categoryDTO1.setCategoryName(category1.getCategoryName());
+
+        // 음성 채널 카테고리
+        RoomCreateWithCCDTO.Category categoryDTO2 = new RoomCreateWithCCDTO.Category();
+        categoryDTO2.setCategoryId(category2.getCategoryId());
+        categoryDTO2.setCategoryName(category2.getCategoryName());
+
+        // 채팅 채널 카테고리 일반 채널
+        RoomCreateWithCCDTO.Channel category1Channel = new RoomCreateWithCCDTO.Channel();
+        category1Channel.setChannelId(channel1.getChannelId());
+        category1Channel.setChannelName(channel1.getChannelName());
+
+        // 음성 채널 카테고리 일반 채널
+        RoomCreateWithCCDTO.Channel category2Channel = new RoomCreateWithCCDTO.Channel();
+        category2Channel.setChannelId(channel2.getChannelId());
+        category2Channel.setChannelName(channel2.getChannelName());
+
+        // 각 카테고리에 일반 채널 리스트로 할당
+        categoryDTO1.setChannels(Arrays.asList(category1Channel));
+        categoryDTO2.setChannels(Arrays.asList(category2Channel));
+
+        // 방에 카테고리 리스트로 할당
+        roomCreateWithCCDTO.setCategories(Arrays.asList(categoryDTO1, categoryDTO2));
+
+        return roomCreateWithCCDTO;
     }
 
     public List<RoomDetailDTO> roomList() {
@@ -93,7 +147,7 @@ public class RoomService {
 
         roomRepository.delete(room);
         RoomRemoveDTO roomRemoveDTO = new RoomRemoveDTO();
-        roomRemoveDTO.setMessage("방을 삭제했습니다");
+
         return roomRemoveDTO;
     }
 
