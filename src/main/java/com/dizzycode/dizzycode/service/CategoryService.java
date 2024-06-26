@@ -3,6 +3,7 @@ package com.dizzycode.dizzycode.service;
 import com.dizzycode.dizzycode.domain.*;
 import com.dizzycode.dizzycode.dto.category.CategoryCreateDTO;
 import com.dizzycode.dizzycode.dto.category.CategoryDetailDTO;
+import com.dizzycode.dizzycode.dto.category.CategoryPostResponseDTO;
 import com.dizzycode.dizzycode.dto.channel.ChannelDetailDTO;
 import com.dizzycode.dizzycode.repository.CategoryRepository;
 import com.dizzycode.dizzycode.repository.ChannelRepository;
@@ -23,7 +24,7 @@ public class CategoryService {
     private final RoomRepository roomRepository;
     private final ChannelRepository channelRepository;
 
-    public CategoryDetailDTO createCategory(Long roomId, CategoryCreateDTO categoryCreateDTO) {
+    public CategoryPostResponseDTO createCategory(Long roomId, CategoryCreateDTO categoryCreateDTO) {
 
         Room room = roomRepository.findByRoomId(roomId);
 
@@ -33,12 +34,12 @@ public class CategoryService {
 
         category = categoryRepository.save(category);
 
-        CategoryDetailDTO categoryDetailDTO = new CategoryDetailDTO();
-        categoryDetailDTO.setCategoryId(category.getCategoryId());
-        categoryDetailDTO.setRoomId(category.getRoom().getRoomId());
-        categoryDetailDTO.setCategoryName(category.getCategoryName());
+        CategoryPostResponseDTO categoryPostResponseDTO = new CategoryPostResponseDTO();
+        categoryPostResponseDTO.setCategoryId(category.getCategoryId());
+        categoryPostResponseDTO.setRoomId(category.getRoom().getRoomId());
+        categoryPostResponseDTO.setCategoryName(category.getCategoryName());
 
-        return categoryDetailDTO;
+        return categoryPostResponseDTO;
     }
 
     public List<CategoryDetailDTO> categoryList(Long roomId) {
@@ -63,7 +64,7 @@ public class CategoryService {
                                         return channelDetailDTO;
                                     }).toList();
 
-                    categoryDetailDTO.setChannelDetailDTOs(channelDetailDTOs);
+                    categoryDetailDTO.setChannels(channelDetailDTOs);
                     return categoryDetailDTO;
                 }).toList();
 
@@ -88,7 +89,7 @@ public class CategoryService {
         categoryDetailDTO.setCategoryId(category.getCategoryId());
         categoryDetailDTO.setCategoryName(category.getCategoryName());
         categoryDetailDTO.setRoomId(roomId);
-        categoryDetailDTO.setChannelDetailDTOs(channelDetailDTOs);
+        categoryDetailDTO.setChannels(channelDetailDTOs);
 
         return categoryDetailDTO;
     }

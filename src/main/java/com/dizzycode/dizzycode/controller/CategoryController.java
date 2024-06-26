@@ -2,6 +2,7 @@ package com.dizzycode.dizzycode.controller;
 
 import com.dizzycode.dizzycode.dto.category.CategoryCreateDTO;
 import com.dizzycode.dizzycode.dto.category.CategoryDetailDTO;
+import com.dizzycode.dizzycode.dto.category.CategoryPostResponseDTO;
 import com.dizzycode.dizzycode.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,7 +17,7 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @PostMapping("/rooms/{roomId}/categories")
-    public ResponseEntity<CategoryDetailDTO> createCategory(@RequestBody CategoryCreateDTO categoryCreateDTO, @PathVariable Long roomId) {
+    public ResponseEntity<CategoryPostResponseDTO> createCategory(@RequestBody CategoryCreateDTO categoryCreateDTO, @PathVariable Long roomId) {
 
         return new ResponseEntity<>(categoryService.createCategory(roomId, categoryCreateDTO), HttpStatus.CREATED);
     }
