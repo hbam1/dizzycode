@@ -6,6 +6,7 @@ import com.dizzycode.dizzycode.domain.Member;
 import com.dizzycode.dizzycode.domain.Room;
 import com.dizzycode.dizzycode.domain.roommember.RoomMember;
 import com.dizzycode.dizzycode.domain.roommember.RoomMemberId;
+import com.dizzycode.dizzycode.dto.RoomMemberDetailDTO;
 import com.dizzycode.dizzycode.dto.room.RoomCreateDTO;
 import com.dizzycode.dizzycode.dto.room.RoomCreateWithCCDTO;
 import com.dizzycode.dizzycode.dto.room.RoomDetailDTO;
@@ -40,6 +41,7 @@ public class RoomService {
         // 방 생성
         Room room = new Room();
         room.setRoomName(roomCreateDTO.getRoomName());
+        room.setOpen(roomCreateDTO.isOpen());
         room = roomRepository.save(room);
 
         // 방과 방 주인 설정
@@ -116,6 +118,7 @@ public class RoomService {
                     RoomDetailDTO roomDetailDTO = new RoomDetailDTO();
                     roomDetailDTO.setRoomId(room.getRoomId());
                     roomDetailDTO.setRoomName(room.getRoomName());
+                    roomDetailDTO.setOpen(room.isOpen());
 
                     return roomDetailDTO;
                 })
@@ -134,6 +137,7 @@ public class RoomService {
         RoomDetailDTO roomDetailDTO = new RoomDetailDTO();
         roomDetailDTO.setRoomId(roomId);
         roomDetailDTO.setRoomName(room.getRoomName());
+        roomDetailDTO.setOpen(room.isOpen());
 
         return roomDetailDTO;
     }
@@ -149,6 +153,32 @@ public class RoomService {
         RoomRemoveDTO roomRemoveDTO = new RoomRemoveDTO();
 
         return roomRemoveDTO;
+    }
+
+    public RoomMemberDetailDTO roomIn(Long roomId) {
+        Member member = getMemberFromSession();
+        Room room = roomRepository.findByRoomId(roomId);
+        RoomMemberId roomMemberId = new RoomMemberId(member.getId(), roomId);
+
+        RoomMember roomMember = new RoomMember();
+        roomMember.setRoomMemberId(roomMemberId);
+        roomMember.setRoom(room);
+        roomMember.setMember(member);
+        RoomMember save = roomMemberRepository.save(roomMember);
+
+        RoomMemberDetailDTO roomMemberDetailDTO = new RoomMemberDetailDTO();
+        roomMemberDetailDTO.setRoomMemberId(save.getRoomMemberId());
+
+        return roomMemberDetailDTO;
+    }
+
+    public boolean roomOut(Long roomId) {
+        Member member = getMemberFromSession();
+        RoomMemberId roomMemberId = new RoomMemberId(member.getId(), roomId);
+        RoomMember roomMember = roomMemberRepository.findRoomMemberByRoomMemberId(roomMemberId);
+        roomMemberRepository.delete(roomMember);
+
+        return true;
     }
 
     private Member getMemberFromSession() {

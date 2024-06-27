@@ -22,4 +22,7 @@ public class Room {
 
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<RoomMember> roomMembers;
+
+    @Column(nullable = false)
+    private boolean open;
 }

@@ -11,6 +11,7 @@ public class RoomCreateWithCCDTO {
 
     private Long roomId;
     private String roomName;
+    private boolean open;
     private List<Category> categories;
 
     @Getter

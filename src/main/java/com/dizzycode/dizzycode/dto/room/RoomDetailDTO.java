@@ -9,4 +9,5 @@ public class RoomDetailDTO {
 
     private Long roomId;
     private String roomName;
+    private boolean open;
 }
