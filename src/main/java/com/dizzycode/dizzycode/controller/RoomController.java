@@ -33,6 +33,12 @@ public class RoomController {
         return new ResponseEntity<>(roomService.roomList(), HttpStatus.OK);
     }
 
+    @GetMapping("/rooms/all")
+    public ResponseEntity<List<RoomDetailDTO>> roomAll() {
+
+        return new ResponseEntity<>(roomService.roomAll(), HttpStatus.OK);
+    }
+
     @GetMapping("/rooms/{roomId}")
     public ResponseEntity<RoomDetailDTO> roomRetrieve(@PathVariable Long roomId) throws ClassNotFoundException {
 

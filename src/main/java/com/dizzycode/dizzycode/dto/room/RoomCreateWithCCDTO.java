@@ -1,9 +1,12 @@
 package com.dizzycode.dizzycode.dto.room;
 
+import com.dizzycode.dizzycode.domain.Channel;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+
+import static com.dizzycode.dizzycode.domain.Channel.*;
 
 @Getter
 @Setter
@@ -29,5 +32,6 @@ public class RoomCreateWithCCDTO {
 
         private Long channelId;
         private String channelName;
+        private ChannelType channelType;
     }
 }

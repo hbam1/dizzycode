@@ -24,12 +24,12 @@ public class ChannelService {
     private final CategoryRepository categoryRepository;
 
     public ChannelDetailDTO createChannel(Long categoryId, ChannelCreateDTO channelCreateDTO) {
-
         Category category = categoryRepository.findCategoryByCategoryId(categoryId);
 
         Channel channel = new Channel();
         channel.setCategory(category);
         channel.setChannelName(channelCreateDTO.getChannelName());
+        channel.setChannelType(channelCreateDTO.getChannelType());
 
         channel = channelRepository.save(channel);
 
@@ -37,6 +37,7 @@ public class ChannelService {
         channelDetailDTO.setChannelId(channel.getChannelId());
         channelDetailDTO.setChannelName(channel.getChannelName());
         channelDetailDTO.setCategoryId(channel.getCategory().getCategoryId());
+        channelDetailDTO.setChannelType(channel.getChannelType());
 
         return channelDetailDTO;
     }
@@ -51,6 +52,8 @@ public class ChannelService {
                     channelDetailDTO.setChannelId(channel.getChannelId());
                     channelDetailDTO.setChannelName(channel.getChannelName());
                     channelDetailDTO.setCategoryId(categoryId);
+                    channelDetailDTO.setChannelType(channel.getChannelType());
+
                     return channelDetailDTO;
                 })
                 .collect(Collectors.toList());
@@ -64,6 +67,7 @@ public class ChannelService {
         channelDetailDTO.setCategoryId(categoryId);
         channelDetailDTO.setChannelId(channel.getChannelId());
         channelDetailDTO.setChannelName(channel.getChannelName());
+        channelDetailDTO.setChannelType(channel.getChannelType());
 
         return channelDetailDTO;
     }

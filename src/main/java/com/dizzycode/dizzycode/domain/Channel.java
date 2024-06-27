@@ -19,4 +19,13 @@ public class Channel {
 
     @Column(nullable = false)
     private String channelName;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ChannelType channelType;
+
+    public enum ChannelType {
+        CHAT,
+        VOICE,
+    }
 }

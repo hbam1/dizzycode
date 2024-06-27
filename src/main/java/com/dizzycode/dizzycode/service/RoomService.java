@@ -67,11 +67,13 @@ public class RoomService {
         Channel channel1 = new Channel();
         channel1.setCategory(category1);
         channel1.setChannelName("일반");
+        channel1.setChannelType(Channel.ChannelType.CHAT);
         channelRepository.save(channel1);
 
         Channel channel2 = new Channel();
         channel2.setCategory(category2);
         channel2.setChannelName("일반");
+        channel2.setChannelType(Channel.ChannelType.VOICE);
         channelRepository.save(channel2);
 
         // 반환 DTO
@@ -94,11 +96,13 @@ public class RoomService {
         RoomCreateWithCCDTO.Channel category1Channel = new RoomCreateWithCCDTO.Channel();
         category1Channel.setChannelId(channel1.getChannelId());
         category1Channel.setChannelName(channel1.getChannelName());
+        category1Channel.setChannelType(Channel.ChannelType.CHAT);
 
         // 음성 채널 카테고리 일반 채널
         RoomCreateWithCCDTO.Channel category2Channel = new RoomCreateWithCCDTO.Channel();
         category2Channel.setChannelId(channel2.getChannelId());
         category2Channel.setChannelName(channel2.getChannelName());
+        category2Channel.setChannelType(Channel.ChannelType.VOICE);
 
         // 각 카테고리에 일반 채널 리스트로 할당
         categoryDTO1.setChannels(Arrays.asList(category1Channel));
@@ -114,6 +118,21 @@ public class RoomService {
         Member member = getMemberFromSession();
 
         List<RoomDetailDTO> rooms = roomMemberRepository.findRoomsByMemberId(member.getId()).stream()
+                .map(room -> {
+                    RoomDetailDTO roomDetailDTO = new RoomDetailDTO();
+                    roomDetailDTO.setRoomId(room.getRoomId());
+                    roomDetailDTO.setRoomName(room.getRoomName());
+                    roomDetailDTO.setOpen(room.isOpen());
+
+                    return roomDetailDTO;
+                })
+                .collect(Collectors.toList());
+
+        return rooms;
+    }
+
+    public List<RoomDetailDTO> roomAll() {
+        List<RoomDetailDTO> rooms = roomRepository.findRoomsByOpenIs(true).stream()
                 .map(room -> {
                     RoomDetailDTO roomDetailDTO = new RoomDetailDTO();
                     roomDetailDTO.setRoomId(room.getRoomId());
