@@ -22,6 +22,12 @@ public class FriendshipController {
         return new ResponseEntity<>(friendshipService.requestFriendship(senderId, receiverId), HttpStatus.CREATED);
     }
 
+    @PostMapping("/friendship/member1/{senderId}/member2_name/{username}")
+    public ResponseEntity<FriendshipDetailDTO> requestFriendshipByUsername(@PathVariable Long senderId, @PathVariable String username) {
+
+        return new ResponseEntity<>(friendshipService.requestFriendshipByUsername(senderId, username), HttpStatus.CREATED);
+    }
+
     @GetMapping("/friendship/member/{memberId}")
     public ResponseEntity<List<FriendshipDetailDTO>> friendList(@PathVariable Long memberId) {
 

@@ -66,6 +66,7 @@ public class FriendshipService {
     }
 
     public FriendshipDetailDTO requestFriendship(Long senderId, Long receiverId) {
+
         Friendship friendship = new Friendship();
         friendship.setId(new FriendshipId(senderId, receiverId));
         Optional<Member> optionalMember1 = memberRepository.findById(senderId);
@@ -73,6 +74,28 @@ public class FriendshipService {
         if (optionalMember1.isPresent() && optionalMember2.isPresent()) {
             friendship.setMember1(optionalMember1.get());
             friendship.setMember2(optionalMember2.get());
+        }
+
+        friendshipRepository.save(friendship);
+
+        FriendshipDetailDTO friendshipDetail = new FriendshipDetailDTO();
+        friendshipDetail.setFriendId(friendship.getMember2().getId());
+        friendshipDetail.setCurrentStatus(friendship.getStatus());
+        friendshipDetail.setFriendName(friendship.getMember2().getUsername());
+
+        return friendshipDetail;
+    }
+
+    public FriendshipDetailDTO requestFriendshipByUsername(Long senderId, String username) {
+
+        Member friend = memberRepository.findByUsername(username);
+        Long friendId = friend.getId();
+        Friendship friendship = new Friendship();
+        friendship.setId(new FriendshipId(senderId, friendId));
+        Optional<Member> optionalMember1 = memberRepository.findById(senderId);
+        if (optionalMember1.isPresent()) {
+            friendship.setMember1(optionalMember1.get());
+            friendship.setMember2(friend);
         }
 
         friendshipRepository.save(friendship);
