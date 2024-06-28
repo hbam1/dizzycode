@@ -4,10 +4,12 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
-@Table(name="categories")
+@Table(name = "categories")
 public class Category {
 
     @Id
@@ -21,4 +23,6 @@ public class Category {
     @Column(nullable = false)
     private String categoryName;
 
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Channel> channels;
 }

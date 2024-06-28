@@ -60,6 +60,7 @@ public class CategoryService {
                                         channelDetailDTO.setCategoryId(category.getCategoryId());
                                         channelDetailDTO.setChannelId(channel.getChannelId());
                                         channelDetailDTO.setChannelName(channel.getChannelName());
+                                        channelDetailDTO.setChannelType(channel.getChannelType());
 
                                         return channelDetailDTO;
                                     }).toList();
