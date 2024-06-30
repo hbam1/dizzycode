@@ -19,6 +19,9 @@ public class Message {
     @Field("member_id")
     private Long memberId;
 
+    @Field("member_username")
+    private String memberUsername;
+
     @Field("room_id")
     private Long roomId;
 
