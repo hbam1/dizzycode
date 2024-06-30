@@ -10,7 +10,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +31,7 @@ public class MessageService {
 
         // 메시지 생성
         message.setMemberId(member.orElseThrow().getId());
+        message.setMemberUsername(member.orElseThrow().getUsername());
         message.setRoomId(roomId);
         message.setCategoryId(categoryId);
         message.setChannelId(channelId);
@@ -39,10 +43,27 @@ public class MessageService {
 
         // 메시지 디테일 반환 dto
         MessageDetailDTO messageDetailDTO = new MessageDetailDTO();
+        messageDetailDTO.setMessageId(newMessage.getMessageId());
         messageDetailDTO.setContent(newMessage.getContent());
         messageDetailDTO.setSenderUsername(member.orElseThrow().getUsername());
-        messageDetailDTO.setTimestamp(message.getCreatedAt());
+        messageDetailDTO.setTimestamp(newMessage.getCreatedAt());
 
         return messageDetailDTO;
+    }
+
+    public List<MessageDetailDTO> messageList(Long channelId, LocalDateTime last) {
+        List<MessageDetailDTO> messageList= messageRepository.findMessages(channelId, last).stream()
+                .map(message -> {
+                    MessageDetailDTO messageDetailDTO = new MessageDetailDTO();
+                    messageDetailDTO.setMessageId(message.getMessageId());
+                    messageDetailDTO.setSenderUsername(message.getMemberUsername());
+                    messageDetailDTO.setContent(message.getContent());
+                    messageDetailDTO.setTimestamp(message.getCreatedAt());
+
+                    return messageDetailDTO;
+                })
+                .collect(Collectors.toList());
+
+        return messageList;
     }
 }
