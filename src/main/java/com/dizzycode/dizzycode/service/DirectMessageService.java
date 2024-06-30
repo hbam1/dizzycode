@@ -28,13 +28,15 @@ public class DirectMessageService {
         DirectMessage directMessage = new DirectMessage();
         directMessage.setContent(content);
         directMessage.setMemberId(senderId);
+        directMessage.setMemberUsername(member.orElseThrow().getUsername());
+        directMessage.setImageUrl("");
         directMessage.setFriendshipId(StringifyFriendshipId(senderId, receiverId));
         DirectMessage newDirectMessage = directMessageRepository.save(directMessage);
 
         DirectMessageDetailDTO messageDetailDTO = new DirectMessageDetailDTO();
         messageDetailDTO.setContent(newDirectMessage.getContent());
         messageDetailDTO.setTimestamp(newDirectMessage.getCreatedAt());
-        messageDetailDTO.setSenderUsername(member.orElseThrow().getUsername());
+        messageDetailDTO.setSenderUsername(newDirectMessage.getMemberUsername());
         messageDetailDTO.setFriendshipId(newDirectMessage.getFriendshipId());
 
         return messageDetailDTO;

@@ -19,6 +19,9 @@ public class DirectMessage {
     @Field("member_id")
     private Long memberId;
 
+    @Field("member_username")
+    private String memberUsername;
+
     @Field("friendship_id")
     private String friendshipId;
 
