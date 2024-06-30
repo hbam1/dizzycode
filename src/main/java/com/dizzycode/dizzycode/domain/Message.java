@@ -17,13 +17,16 @@ public class Message {
     private final String messageId;
 
     @Field("member_id")
-    private String memberId;
+    private Long memberId;
 
     @Field("room_id")
-    private String roomId;
+    private Long roomId;
+
+    @Field("category_id")
+    private Long categoryId;
 
     @Field("channel_id")
-    private String channelId;
+    private Long channelId;
 
     @Field("content")
     private String content;
