@@ -1,5 +1,6 @@
 package com.dizzycode.dizzycode.domain.friendship;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.NoArgsConstructor;
@@ -10,6 +11,7 @@ import java.util.Objects;
 @Embeddable
 @NoArgsConstructor
 public class FriendshipId implements Serializable {
+
     @Column(name = "member_id1")
     private Long memberId1;
 
