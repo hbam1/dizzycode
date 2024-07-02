@@ -1,5 +1,6 @@
 package com.dizzycode.dizzycode.controller;
 
+import com.dizzycode.dizzycode.domain.DirectMessage;
 import com.dizzycode.dizzycode.dto.message.MessageCreateDTO;
 import com.dizzycode.dizzycode.dto.message.MessageDetailDTO;
 import com.dizzycode.dizzycode.dto.message.MessageRoomDTO;
