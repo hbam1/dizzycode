@@ -14,7 +14,7 @@ import java.util.UUID;
 public class Message {
 
     @Id
-    private final String messageId;
+    private  String messageId;
 
     @Field("member_id")
     private Long memberId;
