@@ -19,13 +19,8 @@ public class FriendshipId implements Serializable {
     private Long memberId2;
 
     public FriendshipId(Long memberId1, Long memberId2) {
-        if (memberId1 < memberId2) {
-            this.memberId1 = memberId1;
-            this.memberId2 = memberId2;
-        } else {
-            this.memberId1 = memberId2;
-            this.memberId2 = memberId1;
-        }
+        this.memberId1 = memberId1;
+        this.memberId2 = memberId2;
     }
 
     @Override
@@ -33,12 +28,12 @@ public class FriendshipId implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         FriendshipId that = (FriendshipId) o;
-        return Objects.equals(memberId1, that.memberId1) &&
-                Objects.equals(memberId2, that.memberId2);
+        return (Objects.equals(memberId1, that.memberId1) && Objects.equals(memberId2, that.memberId2)) ||
+                (Objects.equals(memberId1, that.memberId2) && Objects.equals(memberId2, that.memberId1));
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(memberId1, memberId2);
+        return Objects.hash(memberId1) + Objects.hash(memberId2);
     }
 }
