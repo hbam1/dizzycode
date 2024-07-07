@@ -1,11 +1,13 @@
 package com.dizzycode.dizzycode.controller;
 
 import com.dizzycode.dizzycode.domain.Member;
+import com.dizzycode.dizzycode.dto.jwt.SecondaryToken;
 import com.dizzycode.dizzycode.dto.member.MemberDetailDTO;
 import com.dizzycode.dizzycode.dto.member.MemberSignupDTO;
 import com.dizzycode.dizzycode.exception.member.ExistMemberException;
 import com.dizzycode.dizzycode.repository.MemberRepository;
 import com.dizzycode.dizzycode.service.MemberService;
+import com.dizzycode.dizzycode.service.jwt.JWTUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,7 @@ public class MemberController {
 
     private final MemberService memberService;
     private final MemberRepository memberRepository;
+    private final JWTUtil jwtUtil;
 
     @PostMapping("/signup")
     public ResponseEntity<MemberDetailDTO> signUp(@RequestBody MemberSignupDTO memberSignupDTO) {
@@ -49,6 +52,17 @@ public class MemberController {
         memberDetailDTO.setUsername(member.getUsername());
 
         return new ResponseEntity<>(memberDetailDTO, HttpStatus.OK);
+    }
+
+    @GetMapping("/secondary-token")
+    public ResponseEntity<SecondaryToken> secondaryToken() {
+        Member member = getMemberFromSession();
+
+        String secondary = jwtUtil.createJwt("secondary", member.getEmail(), member.getRole().toString(), 600000L);
+        SecondaryToken secondaryToken = new SecondaryToken();
+        secondaryToken.setSecondaryToken(secondary);
+
+        return new ResponseEntity<>(secondaryToken, HttpStatus.OK);
     }
 
     private Member getMemberFromSession() {
