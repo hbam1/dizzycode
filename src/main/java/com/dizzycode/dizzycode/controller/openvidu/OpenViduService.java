@@ -2,6 +2,7 @@ package com.dizzycode.dizzycode.controller.openvidu;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class OpenViduService {
 
     @Value("${openvidu.url}")
@@ -44,6 +46,9 @@ public class OpenViduService {
             throws OpenViduJavaClientException, OpenViduHttpException {
         SessionProperties properties = SessionProperties.fromJson(params).build();
         Session session = openvidu.createSession(properties);
+
+        log.info("session={}", session);
+
         return new ResponseEntity<>(session.getSessionId(), HttpStatus.OK);
     }
 
@@ -62,6 +67,9 @@ public class OpenViduService {
         }
         ConnectionProperties properties = ConnectionProperties.fromJson(params).build();
         Connection connection = session.createConnection(properties);
+
+        log.info("connection={}", connection);
+
         return new ResponseEntity<>(connection.getToken(), HttpStatus.OK);
     }
 }
