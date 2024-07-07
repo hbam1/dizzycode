@@ -110,8 +110,7 @@ public class FriendshipService {
 
     public FriendshipRemoveDTO removeFriendship(Long memberId1, Long memberId2) throws ClassNotFoundException {
 
-        FriendshipId friendshipId = new FriendshipId(memberId1, memberId2);
-        Friendship friendship = friendshipRepository.findFriendshipById(friendshipId);
+        Friendship friendship = friendshipRepository.findFriendshipById(memberId1, memberId2);
 
         if (friendship == null) {
             throw new ClassNotFoundException("친구 관계가 존재하지 않습니다.");
@@ -126,8 +125,7 @@ public class FriendshipService {
 
     public FriendshipDetailDTO acceptFriendshipRequest(Long memberId1, Long memberId2) throws ClassNotFoundException {
 
-        FriendshipId friendshipId = new FriendshipId(memberId1, memberId2);
-        Friendship friendship = friendshipRepository.findFriendshipById(friendshipId);
+        Friendship friendship = friendshipRepository.findFriendshipById(memberId1, memberId2);
 
         if (friendship == null) {
             throw new ClassNotFoundException("친구 관계가 존재하지 않습니다.");
@@ -145,8 +143,7 @@ public class FriendshipService {
 
     public FriendshipDetailDTO rejectFriendshipRequest(Long memberId1, Long memberId2) throws ClassNotFoundException {
 
-        FriendshipId friendshipId = new FriendshipId(memberId1, memberId2);
-        Friendship friendship = friendshipRepository.findFriendshipById(friendshipId);
+        Friendship friendship = friendshipRepository.findFriendshipById(memberId1, memberId2);
 
         if (friendship == null) {
             throw new ClassNotFoundException("친구 관계가 존재하지 않습니다.");

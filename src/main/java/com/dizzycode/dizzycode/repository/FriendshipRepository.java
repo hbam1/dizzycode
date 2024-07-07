@@ -13,5 +13,6 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Friendsh
 
     @Query("SELECT f FROM Friendship f WHERE f.id.memberId1 = :memberId OR f.id.memberId2 = :memberId")
     List<Friendship> findFriendshipsByMemberId(@Param("memberId") Long memberId);
-    Friendship findFriendshipById(FriendshipId friendshipId);
+    @Query("SELECT f FROM Friendship f WHERE (f.id.memberId1 = :memberId1 AND f.id.memberId2 = :memberId2) OR (f.id.memberId1 = :memberId2 AND f.id.memberId2 = :memberId1)")
+    Friendship findFriendshipById(@Param("memberId1") Long memberId1, @Param("memberId2") Long memberId2);
 }
