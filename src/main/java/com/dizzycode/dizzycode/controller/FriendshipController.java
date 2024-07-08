@@ -29,13 +29,13 @@ public class FriendshipController {
     }
 
     @GetMapping("/friendship/member/{memberId}")
-    public ResponseEntity<List<FriendshipDetailDTO>> friendList(@PathVariable Long memberId) {
+    public ResponseEntity<List<FriendshipDetailDTO>> friendList(@PathVariable(name = "memberId") Long memberId) {
 
         return new ResponseEntity<>(friendshipService.friendshipList(memberId), HttpStatus.OK);
     }
 
     @GetMapping("/friendship/pending/member/{memberId}")
-    public ResponseEntity<List<FriendshipDetailDTO>> pendingList(@PathVariable Long memberId) {
+    public ResponseEntity<List<FriendshipDetailDTO>> pendingList(@PathVariable(name = "memberId") Long memberId) {
 
         return new ResponseEntity<>(friendshipService.friendshipPendingList(memberId), HttpStatus.OK);
     }
