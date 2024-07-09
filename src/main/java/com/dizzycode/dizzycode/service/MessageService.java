@@ -61,7 +61,7 @@ public class MessageService {
         RoomMemberId roomMemberId = new RoomMemberId(member.getId(), roomId);
         Optional<RoomMember> roomMember = roomMemberRepository.findById(roomMemberId);
 
-        List<MessageDetailDTO> messageList= messageRepository.findMessages(channelId, last, roomMember.get().getCreatedAt()).stream()
+        List<MessageDetailDTO> messageList= messageRepository.findMessages(channelId, last, roomMember.orElseThrow().getCreatedAt()).stream()
                 .map(message -> {
                     MessageDetailDTO messageDetailDTO = new MessageDetailDTO();
                     messageDetailDTO.setMessageId(message.getMessageId());

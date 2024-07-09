@@ -11,6 +11,7 @@ import com.dizzycode.dizzycode.dto.room.RoomCreateDTO;
 import com.dizzycode.dizzycode.dto.room.RoomCreateWithCCDTO;
 import com.dizzycode.dizzycode.dto.room.RoomDetailDTO;
 import com.dizzycode.dizzycode.dto.room.RoomRemoveDTO;
+import com.dizzycode.dizzycode.exception.member.NoMemberException;
 import com.dizzycode.dizzycode.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -116,6 +117,9 @@ public class RoomService {
 
     public List<RoomDetailDTO> roomList() {
         Member member = getMemberFromSession();
+        if (member == null) {
+            throw new NoMemberException("존재하지 않는 회원입니다");
+        }
 
         List<RoomDetailDTO> rooms = roomMemberRepository.findRoomsByMemberId(member.getId()).stream()
                 .map(room -> {
