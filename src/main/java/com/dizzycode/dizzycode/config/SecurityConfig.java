@@ -83,7 +83,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/signup", "/reissue", "/login", "/").permitAll()
-                        .requestMatchers("/rooms", "/members/detail", "/secondary-token").authenticated()
+                        .requestMatchers("/rooms/*", "/members/detail", "/secondary-token").authenticated()
                         .anyRequest().permitAll());
 //                        .anyRequest().authenticated());
 
