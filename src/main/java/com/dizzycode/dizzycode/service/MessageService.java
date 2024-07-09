@@ -2,12 +2,16 @@ package com.dizzycode.dizzycode.service;
 
 import com.dizzycode.dizzycode.domain.Member;
 import com.dizzycode.dizzycode.domain.Message;
+import com.dizzycode.dizzycode.domain.roommember.RoomMember;
+import com.dizzycode.dizzycode.domain.roommember.RoomMemberId;
 import com.dizzycode.dizzycode.dto.message.MessageCreateDTO;
 import com.dizzycode.dizzycode.dto.message.MessageDetailDTO;
 import com.dizzycode.dizzycode.repository.MemberRepository;
 import com.dizzycode.dizzycode.repository.MessageRepository;
+import com.dizzycode.dizzycode.repository.RoomMemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -22,6 +26,7 @@ public class MessageService {
 
     private final MessageRepository messageRepository;
     private final MemberRepository memberRepository;
+    private final RoomMemberRepository roomMemberRepository;
 
     public MessageDetailDTO saveMessage(MessageCreateDTO messageCreateDTO, Long roomId, Long categoryId, Long channelId) {
         Message message = new Message();
@@ -51,8 +56,12 @@ public class MessageService {
         return messageDetailDTO;
     }
 
-    public List<MessageDetailDTO> messageList(Long channelId, LocalDateTime last) {
-        List<MessageDetailDTO> messageList= messageRepository.findMessages(channelId, last).stream()
+    public List<MessageDetailDTO> messageList(Long channelId, LocalDateTime last, Long roomId) {
+        Member member = getMemberFromSession();
+        RoomMemberId roomMemberId = new RoomMemberId(member.getId(), roomId);
+        Optional<RoomMember> roomMember = roomMemberRepository.findById(roomMemberId);
+
+        List<MessageDetailDTO> messageList= messageRepository.findMessages(channelId, last, roomMember.get().getCreatedAt()).stream()
                 .map(message -> {
                     MessageDetailDTO messageDetailDTO = new MessageDetailDTO();
                     messageDetailDTO.setMessageId(message.getMessageId());
@@ -65,5 +74,13 @@ public class MessageService {
                 .collect(Collectors.toList());
 
         return messageList;
+    }
+
+    private Member getMemberFromSession() {
+        // 현재 인증된 사용자의 인증 객체를 가져옴
+        String[] memberInfo = SecurityContextHolder.getContext().getAuthentication().getName().split(" ");
+        String email = memberInfo[1];
+
+        return memberRepository.findByEmail(email);
     }
 }

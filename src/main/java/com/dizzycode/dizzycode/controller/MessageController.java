@@ -55,6 +55,6 @@ public class MessageController {
     @GetMapping("/rooms/{roomId}/categories/{categoryId}/channels/{channelId}/messages")
     public List<MessageDetailDTO> messageList(@PathVariable Long roomId, @PathVariable Long categoryId, @PathVariable Long channelId, @RequestParam(name = "last", required = false) LocalDateTime last) {
 
-        return messageService.messageList(channelId, last);
+        return messageService.messageList(channelId, last, roomId);
     }
 }
