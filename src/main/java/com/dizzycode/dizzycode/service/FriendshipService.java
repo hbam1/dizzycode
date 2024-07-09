@@ -5,6 +5,8 @@ import com.dizzycode.dizzycode.domain.friendship.Friendship;
 import com.dizzycode.dizzycode.domain.friendship.FriendshipId;
 import com.dizzycode.dizzycode.dto.friendship.FriendshipDetailDTO;
 import com.dizzycode.dizzycode.dto.friendship.FriendshipRemoveDTO;
+import com.dizzycode.dizzycode.exception.friendship.FriendshipAlreadyExistsException;
+import com.dizzycode.dizzycode.exception.friendship.InvalidFriendshipRequestException;
 import com.dizzycode.dizzycode.repository.FriendshipRepository;
 import com.dizzycode.dizzycode.repository.MemberRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -67,8 +69,19 @@ public class FriendshipService {
 
     public FriendshipDetailDTO requestFriendship(Long senderId, Long receiverId) {
 
+        if (senderId.equals(receiverId)) {
+            throw new InvalidFriendshipRequestException("친구 신청을 보낼 수 없는 대상입니다.");
+        }
+
+        FriendshipId friendshipId1 = new FriendshipId(senderId, receiverId);
+        FriendshipId friendshipId2 = new FriendshipId(receiverId, senderId);
+
+        if (friendshipRepository.existsById(friendshipId1) || friendshipRepository.existsById(friendshipId2)) {
+            throw new FriendshipAlreadyExistsException("친구 관계가 이미 존재합니다.");
+        }
+
         Friendship friendship = new Friendship();
-        friendship.setId(new FriendshipId(senderId, receiverId));
+        friendship.setId(friendshipId1);
         Optional<Member> optionalMember1 = memberRepository.findById(senderId);
         Optional<Member> optionalMember2 = memberRepository.findById(receiverId);
         if (optionalMember1.isPresent() && optionalMember2.isPresent()) {
@@ -90,8 +103,20 @@ public class FriendshipService {
 
         Member friend = memberRepository.findByUsername(username);
         Long friendId = friend.getId();
+
+        if (senderId.equals(friendId)) {
+            throw new InvalidFriendshipRequestException("친구 신청을 보낼 수 없는 대상입니다.");
+        }
+
+        FriendshipId friendshipId1 = new FriendshipId(senderId, friendId);
+        FriendshipId friendshipId2 = new FriendshipId(friendId, senderId);
+
+        if (friendshipRepository.existsById(friendshipId1) || friendshipRepository.existsById(friendshipId2)) {
+            throw new FriendshipAlreadyExistsException("친구 관계가 이미 존재합니다.");
+        }
+
         Friendship friendship = new Friendship();
-        friendship.setId(new FriendshipId(senderId, friendId));
+        friendship.setId(friendshipId1);
         Optional<Member> optionalMember1 = memberRepository.findById(senderId);
         if (optionalMember1.isPresent()) {
             friendship.setMember1(optionalMember1.get());
