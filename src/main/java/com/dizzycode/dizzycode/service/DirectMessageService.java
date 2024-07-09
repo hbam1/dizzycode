@@ -11,7 +11,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.swing.text.html.Option;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -20,7 +23,7 @@ public class DirectMessageService {
     private final DirectMessageRepository directMessageRepository;
     private final MemberRepository memberRepository;
 
-    public DirectMessageDetailDTO saveDirectMessage(MessageCreateDTO messageCreateDTO, Long receiverId) {
+    public MessageDetailDTO saveDirectMessage(MessageCreateDTO messageCreateDTO, Long roomId) {
         Long senderId = messageCreateDTO.getSenderId();
         String content = messageCreateDTO.getContent();
         Optional<Member> member = memberRepository.findById(senderId);
@@ -30,25 +33,30 @@ public class DirectMessageService {
         directMessage.setMemberId(senderId);
         directMessage.setMemberUsername(member.orElseThrow().getUsername());
         directMessage.setImageUrl("");
-        directMessage.setFriendshipId(StringifyFriendshipId(senderId, receiverId));
+        directMessage.setRoomId(roomId);
         DirectMessage newDirectMessage = directMessageRepository.save(directMessage);
 
-        DirectMessageDetailDTO messageDetailDTO = new DirectMessageDetailDTO();
+        MessageDetailDTO messageDetailDTO = new MessageDetailDTO();
         messageDetailDTO.setContent(newDirectMessage.getContent());
         messageDetailDTO.setTimestamp(newDirectMessage.getCreatedAt());
         messageDetailDTO.setSenderUsername(newDirectMessage.getMemberUsername());
-        messageDetailDTO.setFriendshipId(newDirectMessage.getFriendshipId());
 
         return messageDetailDTO;
     }
 
-    private String StringifyFriendshipId(Long memberId1, Long memberId2) {
-        String id;
-        if (memberId1 < memberId2) {
-            id = memberId1.toString() + "-" + memberId2.toString();
-        } else {
-            id = memberId2.toString() + "-" + memberId1.toString();
-        }
-        return id;
+    public List<MessageDetailDTO> messageList(Long roomId, LocalDateTime last) {
+        List<MessageDetailDTO> messageList= directMessageRepository.findMessages(roomId, last).stream()
+                .map(message -> {
+                    MessageDetailDTO messageDetailDTO = new MessageDetailDTO();
+                    messageDetailDTO.setMessageId(message.getMessageId());
+                    messageDetailDTO.setSenderUsername(message.getMemberUsername());
+                    messageDetailDTO.setContent(message.getContent());
+                    messageDetailDTO.setTimestamp(message.getCreatedAt());
+
+                    return messageDetailDTO;
+                })
+                .collect(Collectors.toList());
+
+        return messageList;
     }
 }

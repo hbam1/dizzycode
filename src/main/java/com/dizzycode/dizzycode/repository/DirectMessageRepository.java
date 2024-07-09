@@ -12,23 +12,24 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface DirectMessageRepository extends MongoRepository<DirectMessage, String> {
-    @Query("{ 'friendshipId': :#{#friendshipId}, 'createdAt': { $lt: :#{#last} } }")
-    List<Message> findTop20ByFriendshipIdAndCreatedAtBeforeOrderByCreatedAtDesc(
-            @Param("friendshipId") String friendshipId,
+public interface DirectMessageRepository extends MongoRepository<DirectMessage, Long> {
+
+    @Query("{ 'roomId': :#{#roomId}, 'createdAt': { $lt: :#{#last} } }")
+    List<DirectMessage> findTop20ByRoomIdAndCreatedAtBeforeOrderByCreatedAtDesc(
+            @Param("roomId") Long roomId,
             @Param("last") LocalDateTime last,
             Sort sort
     );
 
-    default List<Message> findMessages(String friendshipId, LocalDateTime last) {
+    default List<DirectMessage> findMessages(Long roomId, LocalDateTime last) {
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
         if (last == null) {
-            return findTop20ByFriendshipId(friendshipId, sort);
+            return findTop20ByRoomId(roomId, sort);
         } else {
-            return findTop20ByFriendshipIdAndCreatedAtBeforeOrderByCreatedAtDesc(friendshipId, last, sort);
+            return findTop20ByRoomIdAndCreatedAtBeforeOrderByCreatedAtDesc(roomId, last, sort);
         }
     }
 
-    @Query("{ 'friendshipId': :#{#friendshipId} }")
-    List<Message> findTop20ByFriendshipId(@Param("friendshipId") String friendshipId, Sort sort);
+    @Query("{ 'roomId': :#{#roomId} }")
+    List<DirectMessage> findTop20ByRoomId(@Param("roomId") Long roomId, Sort sort);
 }

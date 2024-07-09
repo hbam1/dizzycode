@@ -22,8 +22,8 @@ public class DirectMessage {
     @Field("member_username")
     private String memberUsername;
 
-    @Field("friendship_id")
-    private String friendshipId;
+    @Field("room_id")
+    private Long roomId;
 
     @Field("content")
     private String content;

@@ -1,12 +1,16 @@
 package com.dizzycode.dizzycode.service;
 
+import com.dizzycode.dizzycode.domain.DirectMessageRoom;
 import com.dizzycode.dizzycode.domain.Member;
 import com.dizzycode.dizzycode.domain.friendship.Friendship;
 import com.dizzycode.dizzycode.domain.friendship.FriendshipId;
+import com.dizzycode.dizzycode.domain.roommember.DMRoomMember;
+import com.dizzycode.dizzycode.domain.roommember.RoomMemberId;
 import com.dizzycode.dizzycode.dto.friendship.FriendshipDetailDTO;
 import com.dizzycode.dizzycode.dto.friendship.FriendshipRemoveDTO;
 import com.dizzycode.dizzycode.exception.friendship.FriendshipAlreadyExistsException;
 import com.dizzycode.dizzycode.exception.friendship.InvalidFriendshipRequestException;
+import com.dizzycode.dizzycode.repository.DirectMessageRoomRepository;
 import com.dizzycode.dizzycode.repository.FriendshipRepository;
 import com.dizzycode.dizzycode.repository.MemberRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -14,8 +18,10 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +29,7 @@ import java.util.Optional;
 public class FriendshipService {
 
     private final FriendshipRepository friendshipRepository;
+    private final DirectMessageRoomRepository directMessageRoomRepository;
     private final MemberRepository memberRepository;
 
     public List<FriendshipDetailDTO> friendshipList(Long memberId) {
@@ -162,6 +169,25 @@ public class FriendshipService {
         friendshipDetail.setFriendId(friendship.getMember2().getId());
         friendshipDetail.setCurrentStatus(friendship.getStatus());
         friendshipDetail.setFriendName(friendship.getMember2().getUsername());
+
+        // 친구 관계가 생성되면 그들간 DM 방을 자동으로 생성
+        DirectMessageRoom directMessageRoom = new DirectMessageRoom();
+        directMessageRoom.setRoomName("");
+        directMessageRoom = directMessageRoomRepository.save(directMessageRoom);
+
+        DMRoomMember member1 = new DMRoomMember();
+        DMRoomMember member2 = new DMRoomMember();
+        member1.setRoom(directMessageRoom);
+        member1.setMember(memberRepository.findById(memberId1).get());
+        member1.setRoomMemberId(new RoomMemberId(memberId1, directMessageRoom.getRoomId()));
+        member2.setRoom(directMessageRoom);
+        member2.setMember(memberRepository.findById(memberId2).get());
+        member2.setRoomMemberId(new RoomMemberId(memberId2, directMessageRoom.getRoomId()));
+
+        Set<DMRoomMember> dmRoomMemberSet = new HashSet<>();
+        dmRoomMemberSet.add(member1);
+        dmRoomMemberSet.add(member2);
+        directMessageRoom.setRoomMembers(dmRoomMemberSet);
 
         return friendshipDetail;
     }
