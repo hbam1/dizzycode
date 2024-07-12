@@ -16,10 +16,16 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final JWTUtil jwtUtil;
 
-    @Override
+//    @Override
+//    public void configureMessageBroker(MessageBrokerRegistry config) {
+//        config.enableSimpleBroker("/topic");
+//        config.setApplicationDestinationPrefixes("/app");
+//    }
 
+    @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/topic");
+        // Use RabbitMQ as the message broker
+        config.enableStompBrokerRelay("/topic");
         config.setApplicationDestinationPrefixes("/app");
     }
 
