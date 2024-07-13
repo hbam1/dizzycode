@@ -1,15 +1,14 @@
 package com.dizzycode.dizzycode.controller;
 
-import com.dizzycode.dizzycode.domain.DirectMessage;
 import com.dizzycode.dizzycode.dto.message.MessageCreateDTO;
 import com.dizzycode.dizzycode.dto.message.MessageDetailDTO;
 import com.dizzycode.dizzycode.dto.message.MessageRoomDTO;
 import com.dizzycode.dizzycode.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,9 +23,9 @@ import java.util.List;
 public class MessageController {
 
     private final MessageService messageService;
-    private final SimpMessagingTemplate messagingTemplate;
+    private final RabbitTemplate rabbitTemplate;
 
-    @MessageMapping("/rooms/{roomId}/categories/{categoryId}/channels/{channelId}")
+    @MessageMapping("rooms.{roomId}.categories.{categoryId}.channels.{channelId}")
     public MessageDetailDTO messageCreate(@DestinationVariable Long roomId,
                              @DestinationVariable Long categoryId,
                              @DestinationVariable Long channelId,
@@ -42,11 +41,12 @@ public class MessageController {
 
         log.info("messageCreate={}", messageCreateDTO.getContent());
 
-        // Send the message to the room topic
-        messagingTemplate.convertAndSend("/topic/rooms/" + roomId, messageRoomDTO);
+        // Send the message to RabbitMQ for the room
+        rabbitTemplate.convertAndSend("amq.topic", "rooms." + roomId, messageRoomDTO);
 
-        // Send the message to the channel topic
-        messagingTemplate.convertAndSend("/topic/rooms/" + roomId + "/categories/" + categoryId + "/channels/" + channelId, messageDetailDTO);
+        // Send the message to RabbitMQ for the channel
+        rabbitTemplate.convertAndSend("amq.topic", "rooms." + roomId + ".categories." + categoryId + ".channels." + channelId, messageDetailDTO);
+
 
 
         return messageDetailDTO;

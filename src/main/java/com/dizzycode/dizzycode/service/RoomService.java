@@ -118,7 +118,7 @@ public class RoomService {
     public List<RoomDetailDTO> roomList() {
         Member member = getMemberFromSession();
         if (member == null) {
-            throw new NoMemberException("존재하지 않는 회원입니다");
+            throw new NoMemberException("존재하지 않는 회원입니다.");
         }
 
         List<RoomDetailDTO> rooms = roomMemberRepository.findRoomsByMemberId(member.getId()).stream()
