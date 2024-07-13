@@ -1,5 +1,6 @@
 package com.dizzycode.dizzycode.service;
 
+import com.dizzycode.dizzycode.dto.file.FileCreateDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Base64;
 
 @Service
 public class FileUploadService {
@@ -31,6 +33,14 @@ public class FileUploadService {
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
         Path targetLocation = this.fileStorageLocation.resolve(fileName);
         Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+        return fileName;
+    }
+
+    public String storeBinaryData(FileCreateDTO fileCreateDTO) throws IOException {
+        String fileName = StringUtils.cleanPath(fileCreateDTO.getFileName());
+        byte[] decodedBytes = Base64.getDecoder().decode(fileCreateDTO.getEncodedFile());
+        Path targetLocation = this.fileStorageLocation.resolve(fileName);
+        Files.write(targetLocation, decodedBytes);
         return fileName;
     }
 }

@@ -2,6 +2,7 @@ package com.dizzycode.dizzycode.controller;
 
 import com.dizzycode.dizzycode.dto.room.DMRoomCreateDTO;
 import com.dizzycode.dizzycode.dto.room.DMRoomCreateResponseDTO;
+import com.dizzycode.dizzycode.dto.room.DMRoomDetailDTO;
 import com.dizzycode.dizzycode.dto.room.RoomDetailDTO;
 import com.dizzycode.dizzycode.service.DirectMessageRoomService;
 import com.dizzycode.dizzycode.service.DirectMessageService;
@@ -27,13 +28,13 @@ public class DMRoomController {
     }
 
     @GetMapping("/direct/rooms")
-    public ResponseEntity<List<RoomDetailDTO>> roomList() {
+    public ResponseEntity<List<DMRoomDetailDTO>> roomList() {
 
         return new ResponseEntity<>(directMessageRoomService.roomList(), HttpStatus.OK);
     }
 
     @GetMapping("/direct/rooms/test/member/{memberId}")
-    public ResponseEntity<List<RoomDetailDTO>> roomListForTest(@PathVariable Long memberId) {
+    public ResponseEntity<List<DMRoomDetailDTO>> roomListForTest(@PathVariable Long memberId) {
 
         return new ResponseEntity<>(directMessageRoomService.roomListForTest(memberId), HttpStatus.OK);
     }

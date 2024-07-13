@@ -7,6 +7,7 @@ import com.dizzycode.dizzycode.domain.roommember.RoomMember;
 import com.dizzycode.dizzycode.domain.roommember.RoomMemberId;
 import com.dizzycode.dizzycode.dto.room.DMRoomCreateDTO;
 import com.dizzycode.dizzycode.dto.room.DMRoomCreateResponseDTO;
+import com.dizzycode.dizzycode.dto.room.DMRoomDetailDTO;
 import com.dizzycode.dizzycode.dto.room.RoomDetailDTO;
 import com.dizzycode.dizzycode.repository.DirectMessageRoomRepository;
 import com.dizzycode.dizzycode.repository.DirectRoomMemberRepository;
@@ -60,16 +61,21 @@ public class DirectMessageRoomService {
         return dmRoomCreateResponseDTO;
     }
 
-    public List<RoomDetailDTO> roomList() {
+    public List<DMRoomDetailDTO> roomList() {
         Member member = getMemberFromSession();
 
-        List<RoomDetailDTO> rooms = directRoomMemberRepository.findRoomsByMemberId(member.getId()).stream()
+        List<DMRoomDetailDTO> rooms = directRoomMemberRepository.findRoomsByMemberId(member.getId()).stream()
                 .map(room -> {
-                    RoomDetailDTO roomDetailDTO = new RoomDetailDTO();
+                    DMRoomDetailDTO roomDetailDTO = new DMRoomDetailDTO();
                     roomDetailDTO.setRoomId(room.getRoomId());
                     roomDetailDTO.setRoomName(room.getRoomName());
                     // 모든 DM room은 잠정적으로 closed 상태라고 가정
                     roomDetailDTO.setOpen(false);
+                    roomDetailDTO.setMemberCount(room.getRoomMembers().size());
+
+                    if (room.getRoomName().isEmpty()) {
+                        roomDetailDTO.setTemporaryRoomName(generateTemporaryName(room.getRoomMembers(), member.getUsername()));
+                    }
 
                     return roomDetailDTO;
                 })
@@ -78,16 +84,21 @@ public class DirectMessageRoomService {
         return rooms;
     }
 
-    public List<RoomDetailDTO> roomListForTest(Long memberId) {
+    public List<DMRoomDetailDTO> roomListForTest(Long memberId) {
         Member member = memberRepository.findById(memberId).get();
 
-        List<RoomDetailDTO> rooms = directRoomMemberRepository.findRoomsByMemberId(member.getId()).stream()
+        List<DMRoomDetailDTO> rooms = directRoomMemberRepository.findRoomsByMemberId(member.getId()).stream()
                 .map(room -> {
-                    RoomDetailDTO roomDetailDTO = new RoomDetailDTO();
+                    DMRoomDetailDTO roomDetailDTO = new DMRoomDetailDTO();
                     roomDetailDTO.setRoomId(room.getRoomId());
                     roomDetailDTO.setRoomName(room.getRoomName());
                     // 모든 DM room은 잠정적으로 closed 상태라고 가정
                     roomDetailDTO.setOpen(false);
+                    roomDetailDTO.setMemberCount(room.getRoomMembers().size());
+
+                    if (room.getRoomName().isEmpty()) {
+                        roomDetailDTO.setTemporaryRoomName(generateTemporaryName(room.getRoomMembers(), member.getUsername()));
+                    }
 
                     return roomDetailDTO;
                 })
@@ -102,5 +113,15 @@ public class DirectMessageRoomService {
         String email = memberInfo[1];
 
         return memberRepository.findByEmail(email);
+    }
+
+    private String generateTemporaryName(Set<DMRoomMember> roomMemberSet, String myName) {
+
+        List<String> usernames = roomMemberSet.stream()
+                .map(dmRoomMember -> dmRoomMember.getMember().getUsername())
+                .filter(username -> !username.equals(myName))
+                .sorted()
+                .collect(Collectors.toList());
+        return String.join(", ", usernames);
     }
 }
