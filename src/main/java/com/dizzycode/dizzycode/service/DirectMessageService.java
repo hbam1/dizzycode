@@ -32,7 +32,7 @@ public class DirectMessageService {
         directMessage.setContent(content);
         directMessage.setMemberId(senderId);
         directMessage.setMemberUsername(member.orElseThrow().getUsername());
-        directMessage.setImageUrl("");
+        directMessage.setImageUrl(messageCreateDTO.getUrl());
         directMessage.setRoomId(roomId);
         DirectMessage newDirectMessage = directMessageRepository.save(directMessage);
 

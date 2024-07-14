@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Base64;
+import java.util.UUID;
 
 @Service
 public class FileUploadService {
@@ -30,14 +31,18 @@ public class FileUploadService {
     }
 
     public String storeFile(MultipartFile file) throws IOException {
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+        String originalFileName = StringUtils.cleanPath(file.getOriginalFilename());
+        String fileExtension = StringUtils.getFilenameExtension(originalFileName);
+        String fileName = UUID.randomUUID().toString() + (fileExtension != null ? "." + fileExtension : "");
         Path targetLocation = this.fileStorageLocation.resolve(fileName);
         Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
         return fileName;
     }
 
     public String storeBinaryData(FileCreateDTO fileCreateDTO) throws IOException {
-        String fileName = StringUtils.cleanPath(fileCreateDTO.getFileName());
+        String originalFileName = StringUtils.cleanPath(fileCreateDTO.getFileName());
+        String fileExtension = StringUtils.getFilenameExtension(originalFileName);
+        String fileName = UUID.randomUUID().toString() + (fileExtension != null ? "." + fileExtension : "");
         byte[] decodedBytes = Base64.getDecoder().decode(fileCreateDTO.getEncodedFile());
         Path targetLocation = this.fileStorageLocation.resolve(fileName);
         Files.write(targetLocation, decodedBytes);

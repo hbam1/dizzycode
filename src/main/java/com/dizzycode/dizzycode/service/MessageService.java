@@ -41,7 +41,7 @@ public class MessageService {
         message.setCategoryId(categoryId);
         message.setChannelId(channelId);
         message.setContent(messageCreateDTO.getContent());
-        message.setImageUrl("");
+        message.setImageUrl(messageCreateDTO.getUrl());
         Message newMessage = messageRepository.save(message);
 
         log.info("messageId={}", newMessage.getMessageId());

@@ -84,27 +84,74 @@ public class DirectMessageRoomService {
         return rooms;
     }
 
-    public List<DMRoomDetailDTO> roomListForTest(Long memberId) {
-        Member member = memberRepository.findById(memberId).get();
+    public DMRoomDetailDTO retrieveDMRoom(Long roomId) {
+        DirectMessageRoom room = directMessageRoomRepository.findById(roomId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 방을 찾을 수 없습니다."));
 
-        List<DMRoomDetailDTO> rooms = directRoomMemberRepository.findRoomsByMemberId(member.getId()).stream()
-                .map(room -> {
-                    DMRoomDetailDTO roomDetailDTO = new DMRoomDetailDTO();
-                    roomDetailDTO.setRoomId(room.getRoomId());
-                    roomDetailDTO.setRoomName(room.getRoomName());
-                    // 모든 DM room은 잠정적으로 closed 상태라고 가정
-                    roomDetailDTO.setOpen(false);
-                    roomDetailDTO.setMemberCount(room.getRoomMembers().size());
+        DMRoomDetailDTO roomDetailDTO = new DMRoomDetailDTO();
+        roomDetailDTO.setRoomId(room.getRoomId());
+        roomDetailDTO.setRoomName(room.getRoomName());
+        roomDetailDTO.setOpen(false);
+        roomDetailDTO.setMemberCount(room.getRoomMembers().size());
 
-                    if (room.getRoomName().isEmpty()) {
-                        roomDetailDTO.setTemporaryRoomName(generateTemporaryName(room.getRoomMembers(), member.getUsername()));
-                    }
+        if (room.getRoomName().isEmpty()) {
+            roomDetailDTO.setTemporaryRoomName(generateTemporaryName(room.getRoomMembers(), getMemberFromSession().getUsername()));
+        }
 
-                    return roomDetailDTO;
-                })
-                .collect(Collectors.toList());
+        return roomDetailDTO;
+    }
 
-        return rooms;
+    public void deleteDMRoom(Long roomId) {
+        DirectMessageRoom room = directMessageRoomRepository.findById(roomId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 방을 찾을 수 없습니다."));
+
+        for (DMRoomMember roomMember : room.getRoomMembers()) {
+            directRoomMemberRepository.delete(roomMember);
+        }
+
+        directMessageRoomRepository.delete(room);
+    }
+
+    public void addMemberToDMRoom(Long roomId, String username) {
+        DirectMessageRoom room = directMessageRoomRepository.findById(roomId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 방을 찾을 수 없습니다."));
+
+        Member member = memberRepository.findByUsername(username);
+        if (member == null) {
+            throw new IllegalArgumentException("해당 유저를 찾을 수 없습니다.");
+        }
+
+        if (room.getRoomMembers().stream().anyMatch(dmRoomMember -> dmRoomMember.getMember().equals(member))) {
+            throw new IllegalArgumentException("이미 방에 속해 있는 멤버입니다.");
+        }
+
+        DMRoomMember roomMember = new DMRoomMember();
+        RoomMemberId roomMemberId = new RoomMemberId(member.getId(), room.getRoomId());
+        roomMember.setMember(member);
+        roomMember.setRoomMemberId(roomMemberId);
+        roomMember.setRoom(room);
+        directRoomMemberRepository.save(roomMember);
+
+        room.getRoomMembers().add(roomMember);
+    }
+
+    public void removeMemberFromDMRoom(Long roomId, String username) {
+        DirectMessageRoom room = directMessageRoomRepository.findById(roomId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 방을 찾을 수 없습니다."));
+
+        Member member = memberRepository.findByUsername(username);
+        if (member == null) {
+            throw new IllegalArgumentException("해당 사용자를 찾을 수 없습니다.");
+        }
+
+        DMRoomMember targetMember = room.getRoomMembers().stream()
+                .filter(dmRoomMember -> dmRoomMember.getMember().equals(member))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("해당 멤버가 방에 속해 있지 않습니다."));
+
+        directRoomMemberRepository.delete(targetMember);
+
+        room.getRoomMembers().remove(targetMember);
     }
 
     private Member getMemberFromSession() {

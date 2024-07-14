@@ -9,4 +9,5 @@ public class MessageCreateDTO {
 
     private Long senderId;
     private String content;
+    private String url;
 }
