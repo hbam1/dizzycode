@@ -26,7 +26,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
         // Use RabbitMQ as the message broker
-        config.enableStompBrokerRelay("/topic");
+        config.enableStompBrokerRelay("/topic")
+                .setRelayHost("rabbitmq") // Docker Compose 네트워크에서 RabbitMQ 컨테이너의 이름 사용
+                .setRelayPort(61613)
+                .setClientLogin("guest")
+                .setClientPasscode("guest");
         config.setApplicationDestinationPrefixes("/app");
         config.setPathMatcher(new AntPathMatcher("."));
     }
