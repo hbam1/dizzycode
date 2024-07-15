@@ -20,8 +20,6 @@ public class RabbitMQConfig {
     private static final String CHAT_QUEUE_NAME = "chat.queue";
     private static final String CHAT_EXCHANGE_NAME = "chat.exchange";
     private static final String ROUTING_KEY = "rooms.*";
-    @Value("${spring.rabbitmq.host}")
-    private String rabbitmqHost;
 
     //Queue 등록
     @Bean
@@ -55,9 +53,7 @@ public class RabbitMQConfig {
     @Bean
     public ConnectionFactory connectionFactory() {
         CachingConnectionFactory factory = new CachingConnectionFactory();
-        factory.setHost(rabbitmqHost);
-        factory.setPort(5672);
-        factory.setVirtualHost("/");
+        factory.setHost("rabbitmq");
         factory.setUsername("guest");
         factory.setPassword("guest");
         return factory;
