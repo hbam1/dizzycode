@@ -74,10 +74,11 @@ public class ReissueController {
 
         String email = jwtUtil.getEmail(refresh);
         String role = jwtUtil.getRole(refresh);
+        Long memberId = jwtUtil.getMemberId(refresh);
 
         //make new JWT
-        String newAccess = jwtUtil.createJwt("access", email, role, 600000L);
-        String newRefresh = jwtUtil.createJwt("refresh", email, role, 86400000L);
+        String newAccess = jwtUtil.createJwt("access", email, role, 600000L, memberId);
+        String newRefresh = jwtUtil.createJwt("refresh", email, role, 86400000L, memberId);
 
         //Refresh 토큰 저장 DB에 기존의 Refresh 토큰 삭제 후 새 Refresh 토큰 저장
         redisTemplate.delete(refresh);
