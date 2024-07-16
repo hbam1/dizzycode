@@ -2,6 +2,7 @@ package com.dizzycode.dizzycode.controller.FileUpload;
 
 import com.dizzycode.dizzycode.dto.file.FileCreateDTO;
 import com.dizzycode.dizzycode.service.FileUploadService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,10 +19,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/file")
+@RequiredArgsConstructor
 public class FileUploadController {
 
-    @Autowired
-    private FileUploadService fileUploadService;
+    private final FileUploadService fileUploadService;
 
     @PostMapping("/upload")
     public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file, Model model) {
