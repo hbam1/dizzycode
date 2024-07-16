@@ -58,7 +58,7 @@ public class MemberController {
     public ResponseEntity<SecondaryToken> secondaryToken() {
         Member member = getMemberFromSession();
 
-        String secondary = jwtUtil.createJwt("secondary", member.getEmail(), member.getRole().toString(), 600000L, member.getId());
+        String secondary = jwtUtil.createJwt("secondary", member.getEmail(), member.getRole().toString(), 600000L, member.getId(), member.getUsername());
         SecondaryToken secondaryToken = new SecondaryToken();
         secondaryToken.setSecondaryToken(secondary);
 

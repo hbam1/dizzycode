@@ -68,8 +68,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String role = auth.getAuthority();
 
         //토큰 생성
-        String access = jwtUtil.createJwt("access", email, role, 600000L, id);
-        String refresh = jwtUtil.createJwt("refresh", email, role, 86400000L, id);
+        String access = jwtUtil.createJwt("access", email, role, 600000L, id, username);
+        String refresh = jwtUtil.createJwt("refresh", email, role, 86400000L, id, username);
 
         ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
         valueOperations.set(refresh, email, 86400000L, TimeUnit.MILLISECONDS);

@@ -28,6 +28,9 @@ public class WebSocketHandshakeInterceptor implements HandshakeInterceptor {
             return false;
         }
 
+        attributes.put("memberId", jwtUtil.getMemberId(token));
+        attributes.put("username", jwtUtil.getUsername(token));
+
         return true;
     }
 

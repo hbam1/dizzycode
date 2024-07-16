@@ -13,9 +13,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.socket.WebSocketSession;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,9 +31,13 @@ public class MessageController {
     public MessageDetailDTO messageCreate(@DestinationVariable Long roomId,
                              @DestinationVariable Long categoryId,
                              @DestinationVariable Long channelId,
-                             MessageCreateDTO messageCreateDTO) throws Exception {
+                             MessageCreateDTO messageCreateDTO, WebSocketSession session) throws Exception {
+        Map<String, Object> attributes = session.getAttributes();
+        Long memberId = (Long) attributes.get("memberId");
+        String username = (String) attributes.get("username");
+
         // 채널 구독자들에게 보낼 메시지 데이터
-        MessageDetailDTO messageDetailDTO = messageService.saveMessage(messageCreateDTO, roomId, categoryId, channelId);
+        MessageDetailDTO messageDetailDTO = messageService.saveMessage(messageCreateDTO, roomId, categoryId, channelId, memberId, username);
 
         // 방 구독자들에게 보낼 메시지 데이터
         MessageRoomDTO messageRoomDTO = new MessageRoomDTO();
