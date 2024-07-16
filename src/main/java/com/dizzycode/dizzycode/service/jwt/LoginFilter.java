@@ -2,7 +2,6 @@ package com.dizzycode.dizzycode.service.jwt;
 
 
 import com.dizzycode.dizzycode.dto.member.MemberDetailDTO;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.Cookie;
@@ -69,8 +68,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String role = auth.getAuthority();
 
         //토큰 생성
-        String access = jwtUtil.createJwt("access", email, role, 600000L);
-        String refresh = jwtUtil.createJwt("refresh", email, role, 86400000L);
+        String access = jwtUtil.createJwt("access", email, role, 600000L, id);
+        String refresh = jwtUtil.createJwt("refresh", email, role, 86400000L, id);
 
         ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
         valueOperations.set(refresh, email, 86400000L, TimeUnit.MILLISECONDS);
