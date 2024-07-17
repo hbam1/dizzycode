@@ -28,17 +28,15 @@ public class MessageService {
     private final MemberRepository memberRepository;
     private final RoomMemberRepository roomMemberRepository;
 
-    public MessageDetailDTO saveMessage(MessageCreateDTO messageCreateDTO, Long roomId, Long categoryId, Long channelId, Long memberId, String username) throws Exception {
+    public MessageDetailDTO saveMessage(MessageCreateDTO messageCreateDTO, Long roomId, Long categoryId, Long channelId) {
         Message message = new Message();
 
         // 로그인한 사용자 확인
-        if (memberId != messageCreateDTO.getSenderId()) {
-            throw new Exception("채팅 권한이 없습니다.");
-        }
+        Optional<Member> member = memberRepository.findById(messageCreateDTO.getSenderId());
 
         // 메시지 생성
-        message.setMemberId(memberId);
-        message.setMemberUsername(username);
+        message.setMemberId(member.orElseThrow().getId());
+        message.setMemberUsername(member.orElseThrow().getUsername());
         message.setRoomId(roomId);
         message.setCategoryId(categoryId);
         message.setChannelId(channelId);
@@ -52,7 +50,7 @@ public class MessageService {
         MessageDetailDTO messageDetailDTO = new MessageDetailDTO();
         messageDetailDTO.setMessageId(newMessage.getMessageId());
         messageDetailDTO.setContent(newMessage.getContent());
-        messageDetailDTO.setSenderUsername(username);
+        messageDetailDTO.setSenderUsername(member.orElseThrow().getUsername());
         messageDetailDTO.setTimestamp(newMessage.getCreatedAt());
 
         return messageDetailDTO;
