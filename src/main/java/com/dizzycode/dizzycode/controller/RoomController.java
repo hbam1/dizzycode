@@ -1,6 +1,7 @@
 package com.dizzycode.dizzycode.controller;
 
 import com.dizzycode.dizzycode.dto.RoomMemberDetailDTO;
+import com.dizzycode.dizzycode.dto.member.MemberStatusDTO;
 import com.dizzycode.dizzycode.dto.room.RoomCreateDTO;
 import com.dizzycode.dizzycode.dto.room.RoomCreateWithCCDTO;
 import com.dizzycode.dizzycode.dto.room.RoomDetailDTO;
@@ -64,7 +65,7 @@ public class RoomController {
     }
 
     @GetMapping("/rooms/{roomId}/members")
-    public ResponseEntity<?> roomMembers(@PathVariable Long roomId) {
+    public ResponseEntity<List<MemberStatusDTO>> roomMembers(@PathVariable Long roomId) {
 
         return new ResponseEntity<>(roomService.getRoomMembers(roomId), HttpStatus.OK);
     }
