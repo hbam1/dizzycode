@@ -1,5 +1,6 @@
 package com.dizzycode.dizzycode.repository;
 
+import com.dizzycode.dizzycode.domain.Member;
 import com.dizzycode.dizzycode.domain.Room;
 import com.dizzycode.dizzycode.domain.roommember.RoomMember;
 import com.dizzycode.dizzycode.domain.roommember.RoomMemberId;
@@ -15,6 +16,9 @@ public interface RoomMemberRepository extends JpaRepository<RoomMember, RoomMemb
 
     @Query("SELECT rm.room FROM RoomMember rm WHERE rm.roomMemberId.memberId = :memberId")
     List<Room> findRoomsByMemberId(@Param("memberId") Long memberID);
+
+    @Query("SELECT rm.member FROM RoomMember rm WHERE rm.roomMemberId.roomId = :roomId")
+    List<Member> findMembersByRoomId(@Param("roomId") Long roomId);
 
     RoomMember findRoomMemberByRoomMemberId(RoomMemberId roomMemberId);
 }

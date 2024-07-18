@@ -62,4 +62,10 @@ public class RoomController {
 
         return new ResponseEntity<>(roomService.roomOut(roomId), HttpStatus.NO_CONTENT);
     }
+
+    @GetMapping("/rooms/{roomId}/members")
+    public ResponseEntity<?> roomMembers(@PathVariable Long roomId) {
+
+        return new ResponseEntity<>(roomService.getRoomMembers(roomId), HttpStatus.OK);
+    }
 }

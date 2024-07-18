@@ -7,6 +7,7 @@ import com.dizzycode.dizzycode.domain.Room;
 import com.dizzycode.dizzycode.domain.roommember.RoomMember;
 import com.dizzycode.dizzycode.domain.roommember.RoomMemberId;
 import com.dizzycode.dizzycode.dto.RoomMemberDetailDTO;
+import com.dizzycode.dizzycode.dto.member.MemberStatusDTO;
 import com.dizzycode.dizzycode.dto.room.RoomCreateDTO;
 import com.dizzycode.dizzycode.dto.room.RoomCreateWithCCDTO;
 import com.dizzycode.dizzycode.dto.room.RoomDetailDTO;
@@ -15,12 +16,16 @@ import com.dizzycode.dizzycode.exception.member.NoMemberException;
 import com.dizzycode.dizzycode.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,6 +39,8 @@ public class RoomService {
     private final RoomMemberRepository roomMemberRepository;
     private final CategoryRepository categoryRepository;
     private final ChannelRepository channelRepository;
+    private final RedisTemplate<String, String> redisTemplate;
+
 
     public RoomCreateWithCCDTO createRoom(RoomCreateDTO roomCreateDTO) {
         // 현재 인증된 사용자의 인증 객체
@@ -202,6 +209,41 @@ public class RoomService {
         roomMemberRepository.delete(roomMember);
 
         return true;
+    }
+
+    public List<MemberStatusDTO> getRoomMembers(Long roomId) {
+        List<Member> members = roomMemberRepository.findMembersByRoomId(roomId);
+
+        // Redis pipeline을 사용하여 모든 멤버의 상태를 한 번에 가져옴
+        List<Object> pipelineResults = redisTemplate.executePipelined((RedisCallback<Object>) connection -> {
+            for (Member member : members) {
+                connection.hashCommands().hGet(("user:" + member.getId()).getBytes(), "status".getBytes());
+            }
+
+            return null;
+        });
+
+        // Redis 결과를 Map 형태로 저장
+        Map<Long, String> memberStatusMap = new HashMap<>();
+        for (int i = 0; i < members.size(); i++) {
+            memberStatusMap.put(members.get(i).getId(), (String) pipelineResults.get(i));
+        }
+
+        // 멤버 리스트와 Redis 결과를 조합하여 MemberStatusDTO 리스트 생성
+        List<MemberStatusDTO> memberStatusDTOs = members.stream()
+                .map(member -> {
+                    MemberStatusDTO memberStatusDTO = new MemberStatusDTO();
+                    memberStatusDTO.setUsername(member.getUsername());
+
+                    // Redis 결과에서 상태를 가져옴
+                    String status = memberStatusMap.get(member.getId());
+                    memberStatusDTO.setStatus(status);
+
+                    return memberStatusDTO;
+                })
+                .collect(Collectors.toList());
+
+        return memberStatusDTOs;
     }
 
     private Member getMemberFromSession() {

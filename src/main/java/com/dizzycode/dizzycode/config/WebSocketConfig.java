@@ -4,6 +4,7 @@ import com.dizzycode.dizzycode.interceptor.WebSocketHandshakeInterceptor;
 import com.dizzycode.dizzycode.service.jwt.JWTUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -16,6 +17,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final JWTUtil jwtUtil;
+    private final RedisTemplate<String, String> redisTemplate;
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
@@ -33,7 +35,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry
                 .addEndpoint("/ws/gs-guide-websocket")
-                .addInterceptors(new WebSocketHandshakeInterceptor(jwtUtil)) // Add interceptor here
+                .addInterceptors(new WebSocketHandshakeInterceptor(jwtUtil, redisTemplate)) // Add interceptor here
                 .setAllowedOrigins("http://localhost:5173")
                 .withSockJS();
     }

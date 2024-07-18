@@ -100,6 +100,9 @@ public class CustomLogoutFilter extends GenericFilterBean {
         cookie.setMaxAge(0);
         cookie.setPath("/");
 
+        // 상태 offline으로 전환
+        redisTemplate.
+
         response.addCookie(cookie);
         response.setStatus(HttpServletResponse.SC_OK);
     }
