@@ -14,6 +14,9 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @RequiredArgsConstructor
 public class CustomLogoutFilter extends GenericFilterBean {
@@ -100,8 +103,15 @@ public class CustomLogoutFilter extends GenericFilterBean {
         cookie.setMaxAge(0);
         cookie.setPath("/");
 
+        LocalDateTime now = LocalDateTime.now();
+
+        // Redis에 사용자 상태 저장
+        Map<String, String> userStatus = new HashMap<>();
+        userStatus.put("status", "offline");
+        userStatus.put("lastActive", now.toString());
+
         // 상태 offline으로 전환
-        redisTemplate.
+        redisTemplate.opsForHash().putAll("user:" + jwtUtil.getMemberId(refresh), userStatus);
 
         response.addCookie(cookie);
         response.setStatus(HttpServletResponse.SC_OK);
