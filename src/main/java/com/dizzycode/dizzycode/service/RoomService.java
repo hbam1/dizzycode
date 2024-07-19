@@ -217,7 +217,7 @@ public class RoomService {
         // Redis pipeline을 사용하여 모든 멤버의 상태를 한 번에 가져옴
         List<Object> pipelineResults = redisTemplate.executePipelined((RedisCallback<Object>) connection -> {
             for (Member member : members) {
-                connection.hashCommands().hGet(("user:" + member.getId()).getBytes(), "status".getBytes());
+                connection.hashCommands().hGet(("member:" + member.getId()).getBytes(), "status".getBytes());
             }
 
             return null;

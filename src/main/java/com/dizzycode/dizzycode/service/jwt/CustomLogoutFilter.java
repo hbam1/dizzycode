@@ -103,16 +103,6 @@ public class CustomLogoutFilter extends GenericFilterBean {
         cookie.setMaxAge(0);
         cookie.setPath("/");
 
-        LocalDateTime now = LocalDateTime.now();
-
-        // Redis에 사용자 상태 저장
-        Map<String, String> userStatus = new HashMap<>();
-        userStatus.put("status", "offline");
-        userStatus.put("lastActive", now.toString());
-
-        // 상태 offline으로 전환
-        redisTemplate.opsForHash().putAll("user:" + jwtUtil.getMemberId(refresh), userStatus);
-
         response.addCookie(cookie);
         response.setStatus(HttpServletResponse.SC_OK);
     }

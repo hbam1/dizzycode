@@ -7,6 +7,7 @@ import lombok.Setter;
 @Setter
 public class RoomMemberStatusDTO {
 
+    private Long memberId;
     private String username;
     private String status;
 }

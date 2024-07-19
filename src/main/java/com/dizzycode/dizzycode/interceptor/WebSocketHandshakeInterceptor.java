@@ -2,7 +2,6 @@ package com.dizzycode.dizzycode.interceptor;
 
 import com.dizzycode.dizzycode.service.jwt.JWTUtil;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
@@ -32,9 +31,6 @@ public class WebSocketHandshakeInterceptor implements HandshakeInterceptor {
             return false;
         }
 
-        attributes.put("memberId", jwtUtil.getMemberId(token));
-        attributes.put("username", jwtUtil.getUsername(token));
-
         return true;
     }
 
@@ -44,6 +40,7 @@ public class WebSocketHandshakeInterceptor implements HandshakeInterceptor {
         String token = servletRequest.getParameter("token");
 
         if (token != null && !jwtUtil.isExpired(token)) {
+            // websocket 연결 후 online으로 접속상태 변경
             Long memberId = jwtUtil.getMemberId(token);
             LocalDateTime now = LocalDateTime.now();
 
@@ -53,7 +50,7 @@ public class WebSocketHandshakeInterceptor implements HandshakeInterceptor {
             userStatus.put("lastActive", now.toString());
 
             // userStatus 맵을 "user:{memberId}" 해시에 저장 (기존 값이 있다면 업데이트)
-            redisTemplate.opsForHash().putAll("user:" + memberId, userStatus);
+            redisTemplate.opsForHash().putAll("member:" + memberId, userStatus);
         }
     }
 }
