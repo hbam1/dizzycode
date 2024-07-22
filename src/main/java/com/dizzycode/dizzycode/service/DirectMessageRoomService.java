@@ -72,6 +72,7 @@ public class DirectMessageRoomService {
                     // 모든 DM room은 잠정적으로 closed 상태라고 가정
                     roomDetailDTO.setOpen(false);
                     roomDetailDTO.setMemberCount(room.getRoomMembers().size());
+                    roomDetailDTO.setUserNames(getUsernamesFromSet(room.getRoomMembers(), getMemberFromSession().getUsername()));
 
                     if (room.getRoomName().isEmpty()) {
                         roomDetailDTO.setTemporaryRoomName(generateTemporaryName(room.getRoomMembers(), member.getUsername()));
@@ -93,6 +94,7 @@ public class DirectMessageRoomService {
         roomDetailDTO.setRoomName(room.getRoomName());
         roomDetailDTO.setOpen(false);
         roomDetailDTO.setMemberCount(room.getRoomMembers().size());
+        roomDetailDTO.setUserNames(getUsernamesFromSet(room.getRoomMembers(), getMemberFromSession().getUsername()));
 
         if (room.getRoomName().isEmpty()) {
             roomDetailDTO.setTemporaryRoomName(generateTemporaryName(room.getRoomMembers(), getMemberFromSession().getUsername()));
@@ -170,5 +172,14 @@ public class DirectMessageRoomService {
                 .sorted()
                 .collect(Collectors.toList());
         return String.join(", ", usernames);
+    }
+
+    private List<String> getUsernamesFromSet(Set<DMRoomMember> roomMemberSet, String myName) {
+        List<String> usernames = roomMemberSet.stream()
+                .map(dmRoomMember -> dmRoomMember.getMember().getUsername())
+                .filter(username -> !username.equals(myName))
+                .sorted()
+                .collect(Collectors.toList());
+        return usernames;
     }
 }
