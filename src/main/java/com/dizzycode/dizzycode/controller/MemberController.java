@@ -74,11 +74,12 @@ public class MemberController {
 
     // 로그인 또는 로그아웃 시에 접속 상태 변경 API
     @PostMapping("/members/status")
-    public ResponseEntity<String> memberStatusChange(RoomMemberStatusDTO roomMemberStatusDTO) {
+    public ResponseEntity<String> memberStatusChange(@RequestBody RoomMemberStatusDTO roomMemberStatusDTO) {
         HashMap<String, String> userStatus = new HashMap<>();
         LocalDateTime now = LocalDateTime.now();
         userStatus.put("status", roomMemberStatusDTO.getStatus());
         userStatus.put("lastActive", now.toString());
+        System.out.println(userStatus);
 
         redisTemplate.opsForHash().putAll("memberId:" + roomMemberStatusDTO.getMemberId(), userStatus);
         return new ResponseEntity("success", HttpStatus.OK);
