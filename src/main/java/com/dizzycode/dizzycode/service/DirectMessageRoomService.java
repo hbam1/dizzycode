@@ -5,6 +5,7 @@ import com.dizzycode.dizzycode.domain.Member;
 import com.dizzycode.dizzycode.domain.roommember.DMRoomMember;
 import com.dizzycode.dizzycode.domain.roommember.RoomMember;
 import com.dizzycode.dizzycode.domain.roommember.RoomMemberId;
+import com.dizzycode.dizzycode.dto.member.MemberStatusDTO;
 import com.dizzycode.dizzycode.dto.room.DMRoomCreateDTO;
 import com.dizzycode.dizzycode.dto.room.DMRoomCreateResponseDTO;
 import com.dizzycode.dizzycode.dto.room.DMRoomDetailDTO;
@@ -15,12 +16,12 @@ import com.dizzycode.dizzycode.repository.MemberRepository;
 import com.dizzycode.dizzycode.repository.RoomMemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,6 +32,7 @@ public class DirectMessageRoomService {
     private final DirectMessageRoomRepository directMessageRoomRepository;
     private final DirectRoomMemberRepository directRoomMemberRepository;
     private final MemberRepository memberRepository;
+    private final RedisTemplate<String, String> redisTemplate;
 
     public DMRoomCreateResponseDTO createDMRoom(DMRoomCreateDTO dmRoomCreateDTO) {
 
@@ -72,6 +74,7 @@ public class DirectMessageRoomService {
                     // 모든 DM room은 잠정적으로 closed 상태라고 가정
                     roomDetailDTO.setOpen(false);
                     roomDetailDTO.setMemberCount(room.getRoomMembers().size());
+                    roomDetailDTO.setUserNames(getUsernamesFromSet(room.getRoomMembers(), getMemberFromSession().getUsername()));
 
                     if (room.getRoomName().isEmpty()) {
                         roomDetailDTO.setTemporaryRoomName(generateTemporaryName(room.getRoomMembers(), member.getUsername()));
@@ -93,6 +96,7 @@ public class DirectMessageRoomService {
         roomDetailDTO.setRoomName(room.getRoomName());
         roomDetailDTO.setOpen(false);
         roomDetailDTO.setMemberCount(room.getRoomMembers().size());
+        roomDetailDTO.setUserNames(getUsernamesFromSet(room.getRoomMembers(), getMemberFromSession().getUsername()));
 
         if (room.getRoomName().isEmpty()) {
             roomDetailDTO.setTemporaryRoomName(generateTemporaryName(room.getRoomMembers(), getMemberFromSession().getUsername()));
@@ -154,6 +158,35 @@ public class DirectMessageRoomService {
         room.getRoomMembers().remove(targetMember);
     }
 
+    public List<MemberStatusDTO> getRoomMembers(Long roomId) {
+        List<Member> members = directRoomMemberRepository.findMembersByRoomId(roomId);
+
+        List<Object> pipelineResults = redisTemplate.executePipelined((RedisCallback<Object>) connection -> {
+            for (Member member : members) {
+                connection.hashCommands().hGet(("memberId:" + member.getId()).getBytes(), "status".getBytes());
+            }
+
+            return null;
+        });
+
+        Map<Long, String> memberStatusMap = new HashMap<>();
+        for (int i = 0; i < members.size(); i++) {
+            memberStatusMap.put(members.get(i).getId(), (String) pipelineResults.get(i));
+        }
+
+        List<MemberStatusDTO> memberStatusDTOs = members.stream()
+                .map(member -> {
+                    MemberStatusDTO memberStatusDTO = new MemberStatusDTO();
+                    memberStatusDTO.setUsername(member.getUsername());
+                    String status = memberStatusMap.get(member.getId());
+                    memberStatusDTO.setStatus(status);
+                    return memberStatusDTO;
+                })
+                .collect(Collectors.toList());
+
+        return memberStatusDTOs;
+    }
+
     private Member getMemberFromSession() {
         // 현재 인증된 사용자의 인증 객체를 가져옴
         String[] memberInfo = SecurityContextHolder.getContext().getAuthentication().getName().split(" ");
@@ -170,5 +203,14 @@ public class DirectMessageRoomService {
                 .sorted()
                 .collect(Collectors.toList());
         return String.join(", ", usernames);
+    }
+
+    private List<String> getUsernamesFromSet(Set<DMRoomMember> roomMemberSet, String myName) {
+        List<String> usernames = roomMemberSet.stream()
+                .map(dmRoomMember -> dmRoomMember.getMember().getUsername())
+                .filter(username -> !username.equals(myName))
+                .sorted()
+                .collect(Collectors.toList());
+        return usernames;
     }
 }

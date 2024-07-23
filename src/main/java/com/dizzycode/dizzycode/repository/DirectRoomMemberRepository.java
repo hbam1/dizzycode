@@ -1,6 +1,7 @@
 package com.dizzycode.dizzycode.repository;
 
 import com.dizzycode.dizzycode.domain.DirectMessageRoom;
+import com.dizzycode.dizzycode.domain.Member;
 import com.dizzycode.dizzycode.domain.Room;
 import com.dizzycode.dizzycode.domain.roommember.DMRoomMember;
 import com.dizzycode.dizzycode.domain.roommember.RoomMember;
@@ -17,6 +18,9 @@ public interface DirectRoomMemberRepository extends JpaRepository<DMRoomMember, 
 
     @Query("SELECT rm.room FROM DMRoomMember rm WHERE rm.roomMemberId.memberId = :memberId")
     List<DirectMessageRoom> findRoomsByMemberId(@Param("memberId") Long memberID);
+
+    @Query("SELECT rm.member FROM DMRoomMember rm WHERE rm.roomMemberId.roomId = :roomId")
+    List<Member> findMembersByRoomId(@Param("roomId") Long roomId);
 
     RoomMember findRoomMemberByRoomMemberId(RoomMemberId roomMemberId);
 }
