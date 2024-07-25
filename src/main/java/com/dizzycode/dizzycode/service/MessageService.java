@@ -44,11 +44,11 @@ public class MessageService {
         message.setImageUrl(messageCreateDTO.getUrl());
         Message newMessage = messageRepository.save(message);
 
-        log.info("messageId={}", newMessage.getMessageId());
+        log.info("messageId={}", newMessage.getId());
 
         // 메시지 디테일 반환 dto
         MessageDetailDTO messageDetailDTO = new MessageDetailDTO();
-        messageDetailDTO.setMessageId(newMessage.getMessageId());
+        messageDetailDTO.setMessageId(newMessage.getId());
         messageDetailDTO.setContent(newMessage.getContent());
         messageDetailDTO.setSenderUsername(member.orElseThrow().getUsername());
         messageDetailDTO.setTimestamp(newMessage.getCreatedAt());
@@ -64,7 +64,7 @@ public class MessageService {
         List<MessageDetailDTO> messageList= messageRepository.findMessages(channelId, last, roomMember.orElseThrow().getCreatedAt()).stream()
                 .map(message -> {
                     MessageDetailDTO messageDetailDTO = new MessageDetailDTO();
-                    messageDetailDTO.setMessageId(message.getMessageId());
+                    messageDetailDTO.setMessageId(message.getId());
                     messageDetailDTO.setSenderUsername(message.getMemberUsername());
                     messageDetailDTO.setContent(message.getContent());
                     messageDetailDTO.setTimestamp(message.getCreatedAt());
