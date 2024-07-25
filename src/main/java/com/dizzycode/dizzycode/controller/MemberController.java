@@ -65,7 +65,7 @@ public class MemberController {
     public ResponseEntity<SecondaryToken> secondaryToken() {
         Member member = getMemberFromSession();
 
-        String secondary = jwtUtil.createJwt("secondary", member.getEmail(), member.getRole().toString(), 600000L, member.getId(), member.getUsername());
+        String secondary = jwtUtil.createJwt("secondary", member.getEmail(), member.getRole().toString(), 30000L, member.getId(), member.getUsername());
         SecondaryToken secondaryToken = new SecondaryToken();
         secondaryToken.setSecondaryToken(secondary);
 
@@ -74,11 +74,12 @@ public class MemberController {
 
     // 로그인 또는 로그아웃 시에 접속 상태 변경 API
     @PostMapping("/members/status")
-    public ResponseEntity<String> memberStatusChange(RoomMemberStatusDTO roomMemberStatusDTO) {
+    public ResponseEntity<String> memberStatusChange(@RequestBody RoomMemberStatusDTO roomMemberStatusDTO) {
         HashMap<String, String> userStatus = new HashMap<>();
         LocalDateTime now = LocalDateTime.now();
         userStatus.put("status", roomMemberStatusDTO.getStatus());
         userStatus.put("lastActive", now.toString());
+        System.out.println(userStatus);
 
         redisTemplate.opsForHash().putAll("memberId:" + roomMemberStatusDTO.getMemberId(), userStatus);
         return new ResponseEntity("success", HttpStatus.OK);

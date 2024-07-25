@@ -1,5 +1,6 @@
 package com.dizzycode.dizzycode.controller;
 
+import com.dizzycode.dizzycode.dto.member.MemberStatusDTO;
 import com.dizzycode.dizzycode.dto.room.DMRoomCreateDTO;
 import com.dizzycode.dizzycode.dto.room.DMRoomCreateResponseDTO;
 import com.dizzycode.dizzycode.dto.room.DMRoomDetailDTO;
@@ -50,5 +51,11 @@ public class DMRoomController {
     public ResponseEntity<String> removeMemberFromDMRoom(@PathVariable Long roomId, @PathVariable String username) {
         directMessageRoomService.removeMemberFromDMRoom(roomId, username);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/direct/rooms/{roomId}/members")
+    public ResponseEntity<List<MemberStatusDTO>> roomMembers(@PathVariable Long roomId) {
+
+        return new ResponseEntity<>(directMessageRoomService.getRoomMembers(roomId), HttpStatus.OK);
     }
 }

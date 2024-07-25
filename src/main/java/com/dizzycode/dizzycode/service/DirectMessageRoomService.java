@@ -5,6 +5,7 @@ import com.dizzycode.dizzycode.domain.Member;
 import com.dizzycode.dizzycode.domain.roommember.DMRoomMember;
 import com.dizzycode.dizzycode.domain.roommember.RoomMember;
 import com.dizzycode.dizzycode.domain.roommember.RoomMemberId;
+import com.dizzycode.dizzycode.dto.member.MemberStatusDTO;
 import com.dizzycode.dizzycode.dto.room.DMRoomCreateDTO;
 import com.dizzycode.dizzycode.dto.room.DMRoomCreateResponseDTO;
 import com.dizzycode.dizzycode.dto.room.DMRoomDetailDTO;
@@ -15,12 +16,12 @@ import com.dizzycode.dizzycode.repository.MemberRepository;
 import com.dizzycode.dizzycode.repository.RoomMemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,6 +32,7 @@ public class DirectMessageRoomService {
     private final DirectMessageRoomRepository directMessageRoomRepository;
     private final DirectRoomMemberRepository directRoomMemberRepository;
     private final MemberRepository memberRepository;
+    private final RedisTemplate<String, String> redisTemplate;
 
     public DMRoomCreateResponseDTO createDMRoom(DMRoomCreateDTO dmRoomCreateDTO) {
 
@@ -154,6 +156,35 @@ public class DirectMessageRoomService {
         directRoomMemberRepository.delete(targetMember);
 
         room.getRoomMembers().remove(targetMember);
+    }
+
+    public List<MemberStatusDTO> getRoomMembers(Long roomId) {
+        List<Member> members = directRoomMemberRepository.findMembersByRoomId(roomId);
+
+        List<Object> pipelineResults = redisTemplate.executePipelined((RedisCallback<Object>) connection -> {
+            for (Member member : members) {
+                connection.hashCommands().hGet(("memberId:" + member.getId()).getBytes(), "status".getBytes());
+            }
+
+            return null;
+        });
+
+        Map<Long, String> memberStatusMap = new HashMap<>();
+        for (int i = 0; i < members.size(); i++) {
+            memberStatusMap.put(members.get(i).getId(), (String) pipelineResults.get(i));
+        }
+
+        List<MemberStatusDTO> memberStatusDTOs = members.stream()
+                .map(member -> {
+                    MemberStatusDTO memberStatusDTO = new MemberStatusDTO();
+                    memberStatusDTO.setUsername(member.getUsername());
+                    String status = memberStatusMap.get(member.getId());
+                    memberStatusDTO.setStatus(status);
+                    return memberStatusDTO;
+                })
+                .collect(Collectors.toList());
+
+        return memberStatusDTOs;
     }
 
     private Member getMemberFromSession() {
