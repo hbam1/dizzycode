@@ -25,4 +25,13 @@ public class DirectMessageRoom {
 
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<DMRoomMember> roomMembers;
+
+    @Column
+    private String friendshipId;
+
+    @Column
+    private boolean groupChat = false;
+
+    @Column
+    private boolean closed = false;
 }

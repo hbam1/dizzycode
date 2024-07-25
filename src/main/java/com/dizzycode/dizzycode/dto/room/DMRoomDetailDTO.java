@@ -14,4 +14,6 @@ public class DMRoomDetailDTO extends RoomDetailDTO {
     int memberCount;
     List<String> userNames;
     String temporaryRoomName;
+    boolean close;
+    boolean groupChat;
 }

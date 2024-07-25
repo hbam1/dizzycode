@@ -1,5 +1,6 @@
 package com.dizzycode.dizzycode.controller;
 
+import com.dizzycode.dizzycode.dto.member.MemberStatusDTO;
 import com.dizzycode.dizzycode.dto.room.RoomMemberStatusDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,9 +32,23 @@ public class MemberStatusController {
 
     @MessageMapping("direct/rooms/{roomId]/status")
     public void dmOnlineStatus(@DestinationVariable Long roomId,
-                             RoomMemberStatusDTO roomMemberStatusDTO) {
+                               RoomMemberStatusDTO roomMemberStatusDTO) {
 
         rabbitTemplate.convertAndSend("amq.topic", "direct.rooms." + roomId + ".status", roomMemberStatusDTO);
+    }
+
+    @MessageMapping("/friendship/status/member1/{memberId1}/member2/{memberId2}")
+    public void friendOnlineStatus(@DestinationVariable Long memberId1, Long memberId2,
+                                   MemberStatusDTO memberStatusDTO) {
+
+        String friendshipId;
+        if (memberId1 < memberId2) {
+            friendshipId = memberId1 + "-" + memberId2;
+        } else {
+            friendshipId = memberId2 + "-" + memberId1;
+        }
+
+        rabbitTemplate.convertAndSend("amq.topic", "friendship." + friendshipId + ".status", memberStatusDTO );
     }
 
     @MessageMapping("members/status/heartbeat")

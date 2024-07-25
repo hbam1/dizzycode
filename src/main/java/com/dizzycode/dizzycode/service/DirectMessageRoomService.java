@@ -34,7 +34,48 @@ public class DirectMessageRoomService {
     private final MemberRepository memberRepository;
     private final RedisTemplate<String, String> redisTemplate;
 
-    public DMRoomCreateResponseDTO createDMRoom(DMRoomCreateDTO dmRoomCreateDTO) {
+    public DMRoomDetailDTO createDMRoom(DMRoomCreateDTO dmRoomCreateDTO) {
+
+        long memberCount = dmRoomCreateDTO.getUserNames().size();
+
+        if (memberCount == 2) {
+            DirectMessageRoom room;
+            room = directMessageRoomRepository.findByFriendshipId(generateFriendshipId(dmRoomCreateDTO.getUserNames()));
+            if (room == null) {
+                room = new DirectMessageRoom();
+                room.setRoomName(dmRoomCreateDTO.getRoomName());
+                room = directMessageRoomRepository.save(room);
+
+                Set<DMRoomMember> roomMemberSet = new HashSet<>();
+
+                for (String username : dmRoomCreateDTO.getUserNames()) {
+                    DMRoomMember roomMember = new DMRoomMember();
+                    Member memberEntity = memberRepository.findByUsername(username);
+                    RoomMemberId roomMemberId = new RoomMemberId(memberEntity.getId(), room.getRoomId());
+                    roomMember.setMember(memberEntity);
+                    roomMember.setRoomMemberId(roomMemberId);
+                    roomMember.setRoom(room);
+
+                    roomMember = directRoomMemberRepository.save(roomMember);
+                    roomMemberSet.add(roomMember);
+                }
+
+                room.setRoomMembers(roomMemberSet);
+                room.setGroupChat(false);
+                room.setFriendshipId(generateFriendshipId(dmRoomCreateDTO.getUserNames()));
+            }
+
+            DMRoomDetailDTO dmRoomDetailDTO = new DMRoomDetailDTO();
+            dmRoomDetailDTO.setRoomId(room.getRoomId());
+            dmRoomDetailDTO.setUserNames(getUsernamesFromSet(room.getRoomMembers(), getMemberFromSession().getUsername()));
+            dmRoomDetailDTO.setMemberCount(room.getRoomMembers().size());
+            dmRoomDetailDTO.setGroupChat(room.isGroupChat());
+            dmRoomDetailDTO.setTemporaryRoomName(generateTemporaryName(room.getRoomMembers(), getMemberFromSession().getUsername()));
+            dmRoomDetailDTO.setRoomName(room.getRoomName());
+            dmRoomDetailDTO.setClose(room.isClosed());
+
+            return dmRoomDetailDTO;
+        }
 
         DirectMessageRoom room = new DirectMessageRoom();
         room.setRoomName(dmRoomCreateDTO.getRoomName());
@@ -55,12 +96,20 @@ public class DirectMessageRoomService {
         }
 
         room.setRoomMembers(roomMemberSet);
+        room.setGroupChat(true);
+        room.setRoomName("");
+        room.setFriendshipId("");
 
-        DMRoomCreateResponseDTO dmRoomCreateResponseDTO = new DMRoomCreateResponseDTO();
-        dmRoomCreateResponseDTO.setRoomId(room.getRoomId());
-        dmRoomCreateResponseDTO.setRoomName(room.getRoomName());
+        DMRoomDetailDTO dmRoomDetailDTO = new DMRoomDetailDTO();
+        dmRoomDetailDTO.setRoomId(room.getRoomId());
+        dmRoomDetailDTO.setUserNames(getUsernamesFromSet(room.getRoomMembers(), getMemberFromSession().getUsername()));
+        dmRoomDetailDTO.setMemberCount(room.getRoomMembers().size());
+        dmRoomDetailDTO.setGroupChat(room.isGroupChat());
+        dmRoomDetailDTO.setTemporaryRoomName(generateTemporaryName(room.getRoomMembers(), getMemberFromSession().getUsername()));
+        dmRoomDetailDTO.setRoomName(room.getRoomName());
+        dmRoomDetailDTO.setClose(room.isClosed());
 
-        return dmRoomCreateResponseDTO;
+        return dmRoomDetailDTO;
     }
 
     public List<DMRoomDetailDTO> roomList() {
@@ -73,6 +122,8 @@ public class DirectMessageRoomService {
                     roomDetailDTO.setRoomName(room.getRoomName());
                     // 모든 DM room은 잠정적으로 closed 상태라고 가정
                     roomDetailDTO.setOpen(false);
+                    roomDetailDTO.setClose(room.isClosed());
+                    roomDetailDTO.setGroupChat(room.isGroupChat());
                     roomDetailDTO.setMemberCount(room.getRoomMembers().size());
                     roomDetailDTO.setUserNames(getUsernamesFromSet(room.getRoomMembers(), getMemberFromSession().getUsername()));
 
@@ -97,6 +148,8 @@ public class DirectMessageRoomService {
         roomDetailDTO.setOpen(false);
         roomDetailDTO.setMemberCount(room.getRoomMembers().size());
         roomDetailDTO.setUserNames(getUsernamesFromSet(room.getRoomMembers(), getMemberFromSession().getUsername()));
+        roomDetailDTO.setClose(room.isClosed());
+        roomDetailDTO.setGroupChat(room.isGroupChat());
 
         if (room.getRoomName().isEmpty()) {
             roomDetailDTO.setTemporaryRoomName(generateTemporaryName(room.getRoomMembers(), getMemberFromSession().getUsername()));
@@ -116,7 +169,7 @@ public class DirectMessageRoomService {
         directMessageRoomRepository.delete(room);
     }
 
-    public void addMemberToDMRoom(Long roomId, String username) {
+    public DMRoomDetailDTO addMemberToDMRoom(Long roomId, String username) {
         DirectMessageRoom room = directMessageRoomRepository.findById(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 방을 찾을 수 없습니다."));
 
@@ -129,14 +182,39 @@ public class DirectMessageRoomService {
             throw new IllegalArgumentException("이미 방에 속해 있는 멤버입니다.");
         }
 
-        DMRoomMember roomMember = new DMRoomMember();
-        RoomMemberId roomMemberId = new RoomMemberId(member.getId(), room.getRoomId());
-        roomMember.setMember(member);
-        roomMember.setRoomMemberId(roomMemberId);
-        roomMember.setRoom(room);
-        directRoomMemberRepository.save(roomMember);
+        if (!room.isGroupChat()) {
+            List<String> usernames = room.getRoomMembers().stream().map(user ->
+                user.getMember().getUsername()).collect(Collectors.toCollection(ArrayList::new));
+            usernames.add(username);
 
-        room.getRoomMembers().add(roomMember);
+            DMRoomCreateDTO dmRoomCreateDTO = new DMRoomCreateDTO();
+            dmRoomCreateDTO.setRoomName("");
+            dmRoomCreateDTO.setUserNames(usernames);
+            DMRoomDetailDTO dmRoomDetailDTO = createDMRoom(dmRoomCreateDTO);
+
+            return dmRoomDetailDTO;
+
+        } else {
+            DMRoomMember roomMember = new DMRoomMember();
+            RoomMemberId roomMemberId = new RoomMemberId(member.getId(), room.getRoomId());
+            roomMember.setMember(member);
+            roomMember.setRoomMemberId(roomMemberId);
+            roomMember.setRoom(room);
+            directRoomMemberRepository.save(roomMember);
+
+            room.getRoomMembers().add(roomMember);
+            room.setGroupChat(true);
+
+            DMRoomDetailDTO dmRoomDetailDTO = new DMRoomDetailDTO();
+            dmRoomDetailDTO.setUserNames(getUsernamesFromSet(room.getRoomMembers(), getMemberFromSession().getUsername()));
+            dmRoomDetailDTO.setMemberCount(room.getRoomMembers().size());
+            dmRoomDetailDTO.setGroupChat(room.isGroupChat());
+            dmRoomDetailDTO.setTemporaryRoomName(generateTemporaryName(room.getRoomMembers(), getMemberFromSession().getUsername()));
+            dmRoomDetailDTO.setRoomName(room.getRoomName());
+            dmRoomDetailDTO.setClose(room.isClosed());
+
+            return dmRoomDetailDTO;
+        }
     }
 
     public void removeMemberFromDMRoom(Long roomId, String username) {
@@ -185,6 +263,13 @@ public class DirectMessageRoomService {
                 .collect(Collectors.toList());
 
         return memberStatusDTOs;
+    }
+
+    private String generateFriendshipId(List<String> usernames) {
+        String friendshipId = usernames.stream().map(username ->
+            memberRepository.findByUsername(username).getId()).sorted(Comparator.naturalOrder()).map(String::valueOf).collect(Collectors.joining("-"));
+
+        return friendshipId;
     }
 
     private Member getMemberFromSession() {

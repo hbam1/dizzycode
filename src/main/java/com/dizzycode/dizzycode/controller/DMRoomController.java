@@ -21,7 +21,7 @@ public class DMRoomController {
     private final DirectMessageRoomService directMessageRoomService;
 
     @PostMapping("/direct/rooms")
-    public ResponseEntity<DMRoomCreateResponseDTO> createDMRoom(@RequestBody DMRoomCreateDTO dmRoomCreateDTO) {
+    public ResponseEntity<DMRoomDetailDTO> createDMRoom(@RequestBody DMRoomCreateDTO dmRoomCreateDTO) {
         return new ResponseEntity<>(directMessageRoomService.createDMRoom(dmRoomCreateDTO), HttpStatus.CREATED);
     }
 
@@ -42,9 +42,8 @@ public class DMRoomController {
     }
 
     @PostMapping("/direct/rooms/{roomId}/members/{username}")
-    public ResponseEntity<String> addMemberToDMRoom(@PathVariable Long roomId, @PathVariable String username) {
-        directMessageRoomService.addMemberToDMRoom(roomId, username);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<DMRoomDetailDTO> addMemberToDMRoom(@PathVariable Long roomId, @PathVariable String username) {
+        return new ResponseEntity<>(directMessageRoomService.addMemberToDMRoom(roomId, username), HttpStatus.OK);
     }
 
     @DeleteMapping("/direct/rooms/{roomId}/members/{username}")
