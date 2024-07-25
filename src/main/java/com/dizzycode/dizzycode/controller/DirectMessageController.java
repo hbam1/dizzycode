@@ -2,6 +2,7 @@ package com.dizzycode.dizzycode.controller;
 
 import com.dizzycode.dizzycode.dto.message.MessageCreateDTO;
 import com.dizzycode.dizzycode.dto.message.MessageDetailDTO;
+import com.dizzycode.dizzycode.dto.message.MessageRoomDTO;
 import com.dizzycode.dizzycode.service.DirectMessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +32,11 @@ public class DirectMessageController {
         MessageDetailDTO messageDetailDTO = directMessageService.saveDirectMessage(messageCreateDTO, roomId);
 
         log.info("messageCreate={}", messageCreateDTO.getContent());
+
+        MessageRoomDTO messageRoomDTO = new MessageRoomDTO();
+        messageRoomDTO.setRoomId(roomId);
+
+        rabbitTemplate.convertAndSend("amq.topic", "direct.check.room." + roomId, messageRoomDTO);
 
         rabbitTemplate.convertAndSend("amq.topic", "direct.room." + roomId, messageDetailDTO);
 

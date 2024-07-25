@@ -29,6 +29,13 @@ public class MemberStatusController {
         rabbitTemplate.convertAndSend("amq.topic", "rooms." + roomId + ".status", roomMemberStatusDTO);
     }
 
+    @MessageMapping("direct/rooms/{roomId]/status")
+    public void dmOnlineStatus(@DestinationVariable Long roomId,
+                             RoomMemberStatusDTO roomMemberStatusDTO) {
+
+        rabbitTemplate.convertAndSend("amq.topic", "direct.rooms." + roomId + ".status", roomMemberStatusDTO);
+    }
+
     @MessageMapping("members/status/heartbeat")
     public void statusHeartbeat(RoomMemberStatusDTO roomMemberStatusDTO) {
 
