@@ -14,7 +14,7 @@ import java.util.UUID;
 public class Message {
 
     @Id
-    private  String messageId;
+    private String id; // MongoDB의 기본 ID 필드
 
     @Field("member_id")
     private Long memberId;
@@ -39,8 +39,4 @@ public class Message {
 
     @Field("created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
-
-    public Message() {
-        this.messageId = UUID.randomUUID().toString(); // Custom UUID as _id
-    }
 }

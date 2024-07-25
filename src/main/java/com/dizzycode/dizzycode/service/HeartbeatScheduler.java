@@ -34,7 +34,7 @@ public class HeartbeatScheduler {
                     if (lastActive.plusSeconds(thresholdSeconds).isBefore(currentTime)) {
                         // 상태를 offline으로 변경
                         redisTemplate.opsForHash().put(key, "status", "offline");
-                        log.info("key={}", key);
+                        log.info("key={}", lastActive);
                     }
                 }
             }

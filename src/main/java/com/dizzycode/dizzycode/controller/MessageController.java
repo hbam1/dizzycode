@@ -47,8 +47,6 @@ public class MessageController {
         // Send the message to RabbitMQ for the channel
         rabbitTemplate.convertAndSend("amq.topic", "rooms." + roomId + ".categories." + categoryId + ".channels." + channelId, messageDetailDTO);
 
-
-
         return messageDetailDTO;
     }
 
