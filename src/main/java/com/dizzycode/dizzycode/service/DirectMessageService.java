@@ -37,6 +37,7 @@ public class DirectMessageService {
         DirectMessage newDirectMessage = directMessageRepository.save(directMessage);
 
         MessageDetailDTO messageDetailDTO = new MessageDetailDTO();
+        messageDetailDTO.setId(newDirectMessage.getId());
         messageDetailDTO.setContent(newDirectMessage.getContent());
         messageDetailDTO.setTimestamp(newDirectMessage.getCreatedAt());
         messageDetailDTO.setSenderUsername(newDirectMessage.getMemberUsername());
