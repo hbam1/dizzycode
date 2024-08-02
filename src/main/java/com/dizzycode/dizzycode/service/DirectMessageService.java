@@ -37,7 +37,7 @@ public class DirectMessageService {
         DirectMessage newDirectMessage = directMessageRepository.save(directMessage);
 
         MessageDetailDTO messageDetailDTO = new MessageDetailDTO();
-        messageDetailDTO.setId(newDirectMessage.getId());
+        messageDetailDTO.setMessageId(newDirectMessage.getId());
         messageDetailDTO.setContent(newDirectMessage.getContent());
         messageDetailDTO.setTimestamp(newDirectMessage.getCreatedAt());
         messageDetailDTO.setSenderUsername(newDirectMessage.getMemberUsername());
@@ -49,7 +49,7 @@ public class DirectMessageService {
         List<MessageDetailDTO> messageList= directMessageRepository.findMessages(roomId, last).stream()
                 .map(message -> {
                     MessageDetailDTO messageDetailDTO = new MessageDetailDTO();
-                    messageDetailDTO.setId(message.getId());
+                    messageDetailDTO.setMessageId(message.getId());
                     messageDetailDTO.setSenderUsername(message.getMemberUsername());
                     messageDetailDTO.setContent(message.getContent());
                     messageDetailDTO.setTimestamp(message.getCreatedAt());

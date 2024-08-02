@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Setter
 public class MessageDetailDTO {
 
-    private String id;
+    private String messageId;
     private String senderUsername;
     private String content;
     private LocalDateTime timestamp; // 메시지 생성 시간 추가
