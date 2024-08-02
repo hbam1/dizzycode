@@ -1,7 +1,7 @@
 package com.dizzycode.dizzycode.config;
 
 import com.dizzycode.dizzycode.interceptor.WebSocketHandshakeInterceptor;
-import com.dizzycode.dizzycode.service.jwt.JWTUtil;
+import com.dizzycode.dizzycode.common.JWTUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;

@@ -2,7 +2,7 @@ package com.dizzycode.dizzycode.member.service;
 
 import com.dizzycode.dizzycode.member.controller.response.MemberCreateResponse;
 import com.dizzycode.dizzycode.member.domain.Member;
-import com.dizzycode.dizzycode.service.jwt.JWTUtil;
+import com.dizzycode.dizzycode.common.JWTUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.Cookie;

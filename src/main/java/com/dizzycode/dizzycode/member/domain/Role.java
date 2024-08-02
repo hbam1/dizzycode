@@ -1,12 +1,12 @@
-package com.dizzycode.dizzycode.domain.enumerate;
+package com.dizzycode.dizzycode.member.domain;
 
-public enum RoleEnum {
+public enum Role {
     // member 권한
     ROLE_USER,
     ROLE_ADMIN;
 
-    public static RoleEnum fromString(String role) {
-        for (RoleEnum r : RoleEnum.values()) {
+    public static Role fromString(String role) {
+        for (Role r : Role.values()) {
             if (r.name().equalsIgnoreCase(role)) {
                 return r;
             }

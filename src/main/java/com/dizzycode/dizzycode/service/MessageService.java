@@ -1,5 +1,6 @@
 package com.dizzycode.dizzycode.service;
 
+import com.dizzycode.dizzycode.exception.member.NoMemberException;
 import com.dizzycode.dizzycode.member.infrastructure.MemberEntity;
 import com.dizzycode.dizzycode.domain.Message;
 import com.dizzycode.dizzycode.domain.roommember.RoomMember;
@@ -81,6 +82,6 @@ public class MessageService {
         String[] memberInfo = SecurityContextHolder.getContext().getAuthentication().getName().split(" ");
         String email = memberInfo[1];
 
-        return memberJpaRepository.findByEmail(email);
+        return memberJpaRepository.findByEmail(email).orElseThrow(() -> new NoMemberException("존재하지 않는 회원입니다."));
     }
 }

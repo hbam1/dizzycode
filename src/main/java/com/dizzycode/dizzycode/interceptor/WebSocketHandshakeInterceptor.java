@@ -1,6 +1,6 @@
 package com.dizzycode.dizzycode.interceptor;
 
-import com.dizzycode.dizzycode.service.jwt.JWTUtil;
+import com.dizzycode.dizzycode.common.JWTUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;

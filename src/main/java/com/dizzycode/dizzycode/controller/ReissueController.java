@@ -1,6 +1,6 @@
 package com.dizzycode.dizzycode.controller;
 
-import com.dizzycode.dizzycode.service.jwt.JWTUtil;
+import com.dizzycode.dizzycode.common.JWTUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;

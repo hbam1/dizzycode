@@ -1,6 +1,7 @@
 package com.dizzycode.dizzycode.service;
 
 import com.dizzycode.dizzycode.domain.DirectMessageRoom;
+import com.dizzycode.dizzycode.exception.member.NoMemberException;
 import com.dizzycode.dizzycode.member.infrastructure.MemberEntity;
 import com.dizzycode.dizzycode.domain.roommember.DMRoomMember;
 import com.dizzycode.dizzycode.domain.roommember.RoomMemberId;
@@ -46,7 +47,7 @@ public class DirectMessageRoomService {
 
                 for (String username : dmRoomCreateDTO.getUserNames()) {
                     DMRoomMember roomMember = new DMRoomMember();
-                    MemberEntity memberEntity = memberJpaRepository.findByUsername(username);
+                    MemberEntity memberEntity = memberJpaRepository.findByUsername(username).orElseThrow(() -> new NoMemberException("존재하지 않는 회원입니다."));
                     RoomMemberId roomMemberId = new RoomMemberId(memberEntity.getId(), room.getRoomId());
                     roomMember.setMemberEntity(memberEntity);
                     roomMember.setRoomMemberId(roomMemberId);
@@ -81,7 +82,7 @@ public class DirectMessageRoomService {
 
         for (String username : dmRoomCreateDTO.getUserNames()) {
             DMRoomMember roomMember = new DMRoomMember();
-            MemberEntity memberEntity = memberJpaRepository.findByUsername(username);
+            MemberEntity memberEntity = memberJpaRepository.findByUsername(username).orElseThrow(() -> new NoMemberException("존재하지 않는 회원입니다."));
             RoomMemberId roomMemberId = new RoomMemberId(memberEntity.getId(), room.getRoomId());
             roomMember.setMemberEntity(memberEntity);
             roomMember.setRoomMemberId(roomMemberId);
@@ -169,7 +170,7 @@ public class DirectMessageRoomService {
         DirectMessageRoom room = directMessageRoomRepository.findById(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 방을 찾을 수 없습니다."));
 
-        MemberEntity memberEntity = memberJpaRepository.findByUsername(username);
+        MemberEntity memberEntity = memberJpaRepository.findByUsername(username).orElseThrow(() -> new NoMemberException("존재하지 않는 회원입니다."));
         if (memberEntity == null) {
             throw new IllegalArgumentException("해당 유저를 찾을 수 없습니다.");
         }
@@ -217,7 +218,7 @@ public class DirectMessageRoomService {
         DirectMessageRoom room = directMessageRoomRepository.findById(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 방을 찾을 수 없습니다."));
 
-        MemberEntity memberEntity = memberJpaRepository.findByUsername(username);
+        MemberEntity memberEntity = memberJpaRepository.findByUsername(username).orElseThrow(() -> new NoMemberException("존재하지 않는 회원입니다."));
         if (memberEntity == null) {
             throw new IllegalArgumentException("해당 사용자를 찾을 수 없습니다.");
         }
@@ -263,7 +264,7 @@ public class DirectMessageRoomService {
 
     private String generateFriendshipId(List<String> usernames) {
         String friendshipId = usernames.stream().map(username ->
-            memberJpaRepository.findByUsername(username).getId()).sorted(Comparator.naturalOrder()).map(String::valueOf).collect(Collectors.joining("-"));
+            memberJpaRepository.findByUsername(username).get().getId()).sorted(Comparator.naturalOrder()).map(String::valueOf).collect(Collectors.joining("-"));
 
         return friendshipId;
     }
@@ -273,7 +274,7 @@ public class DirectMessageRoomService {
         String[] memberInfo = SecurityContextHolder.getContext().getAuthentication().getName().split(" ");
         String email = memberInfo[1];
 
-        return memberJpaRepository.findByEmail(email);
+        return memberJpaRepository.findByEmail(email).orElseThrow(() -> new NoMemberException("존재하지 않는 회원입니다."));
     }
 
     private String generateTemporaryName(Set<DMRoomMember> roomMemberSet, String myName) {

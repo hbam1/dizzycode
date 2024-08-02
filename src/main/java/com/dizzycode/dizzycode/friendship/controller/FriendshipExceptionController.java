@@ -1,6 +1,6 @@
-package com.dizzycode.dizzycode.controller.exception;
+package com.dizzycode.dizzycode.friendship.controller;
 
-import com.dizzycode.dizzycode.controller.FriendshipController;
+import com.dizzycode.dizzycode.friendship.controller.FriendshipController;
 import com.dizzycode.dizzycode.dto.ErrorResult;
 import com.dizzycode.dizzycode.exception.friendship.FriendshipAlreadyExistsException;
 import com.dizzycode.dizzycode.exception.friendship.InvalidFriendshipRequestException;

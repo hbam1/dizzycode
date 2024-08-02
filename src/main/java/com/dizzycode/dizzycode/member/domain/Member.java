@@ -1,6 +1,5 @@
 package com.dizzycode.dizzycode.member.domain;
 
-import com.dizzycode.dizzycode.domain.enumerate.RoleEnum;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -11,10 +10,10 @@ public class Member {
     private final String email;
     private final String password;
     private final String username;
-    private final RoleEnum role;
+    private final Role role;
 
     @Builder
-    public Member(Long id, String email, String password, String username, RoleEnum role) {
+    public Member(Long id, String email, String password, String username, Role role) {
         this.id = id;
         this.email = email;
         this.password = password;
@@ -27,7 +26,7 @@ public class Member {
                 .email(memberSignup.getEmail())
                 .password(encodedPassword)
                 .username(memberSignup.getUsername())
-                .role(RoleEnum.ROLE_USER)
+                .role(Role.ROLE_USER)
                 .build();
     }
 }

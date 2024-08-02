@@ -6,7 +6,7 @@ import com.dizzycode.dizzycode.exception.member.NoMemberException;
 import com.dizzycode.dizzycode.member.domain.Member;
 import com.dizzycode.dizzycode.member.domain.MemberSignup;
 import com.dizzycode.dizzycode.member.service.port.MemberRepository;
-import com.dizzycode.dizzycode.service.jwt.JWTUtil;
+import com.dizzycode.dizzycode.common.JWTUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

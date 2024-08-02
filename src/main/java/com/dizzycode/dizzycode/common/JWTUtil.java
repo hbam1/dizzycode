@@ -1,4 +1,4 @@
-package com.dizzycode.dizzycode.service.jwt;
+package com.dizzycode.dizzycode.common;
 
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Value;

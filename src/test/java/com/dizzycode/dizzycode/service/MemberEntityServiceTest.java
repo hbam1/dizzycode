@@ -2,7 +2,7 @@ package com.dizzycode.dizzycode.service;
 
 import com.dizzycode.dizzycode.member.domain.Member;
 import com.dizzycode.dizzycode.member.infrastructure.MemberEntity;
-import com.dizzycode.dizzycode.domain.enumerate.RoleEnum;
+import com.dizzycode.dizzycode.member.domain.Role;
 import com.dizzycode.dizzycode.member.domain.MemberSignup;
 import com.dizzycode.dizzycode.member.infrastructure.MemberJpaRepository;
 import com.dizzycode.dizzycode.member.service.MemberService;
@@ -46,7 +46,7 @@ public class MemberEntityServiceTest {
         memberEntity.setEmail(memberSignup.getEmail());
         memberEntity.setPassword("encryptedPassword");
         memberEntity.setUsername(memberSignup.getUsername());
-        memberEntity.setRole(RoleEnum.ROLE_USER);
+        memberEntity.setRole(Role.ROLE_USER);
 
         when(bCryptPasswordEncoder.encode(memberSignup.getPassword())).thenReturn("encryptedPassword");
         when(memberJpaRepository.save(any(MemberEntity.class))).thenReturn(memberEntity);
@@ -56,6 +56,6 @@ public class MemberEntityServiceTest {
         assertEquals(memberSignup.getEmail(), createdMember.getEmail());
         assertEquals("encryptedPassword", createdMember.getPassword());
         assertEquals(memberSignup.getUsername(), createdMember.getUsername());
-        assertEquals(RoleEnum.ROLE_USER, createdMember.getRole());
+        assertEquals(Role.ROLE_USER, createdMember.getRole());
     }
 }

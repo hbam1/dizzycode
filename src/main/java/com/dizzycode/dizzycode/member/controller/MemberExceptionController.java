@@ -1,4 +1,4 @@
-package com.dizzycode.dizzycode.controller.exception;
+package com.dizzycode.dizzycode.member.controller;
 
 import com.dizzycode.dizzycode.exception.member.NoMemberException;
 import com.dizzycode.dizzycode.member.controller.MemberController;

@@ -1,8 +1,8 @@
-package com.dizzycode.dizzycode.controller;
+package com.dizzycode.dizzycode.friendship.controller;
 
 import com.dizzycode.dizzycode.dto.friendship.FriendshipDetailDTO;
 import com.dizzycode.dizzycode.dto.friendship.FriendshipRemoveDTO;
-import com.dizzycode.dizzycode.service.FriendshipService;
+import com.dizzycode.dizzycode.friendship.service.FriendshipService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

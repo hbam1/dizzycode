@@ -1,6 +1,6 @@
 package com.dizzycode.dizzycode.member.infrastructure;
 
-import com.dizzycode.dizzycode.domain.enumerate.RoleEnum;
+import com.dizzycode.dizzycode.member.domain.Role;
 import com.dizzycode.dizzycode.member.domain.Member;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -27,7 +27,7 @@ public class MemberEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private RoleEnum role;
+    private Role role;
 
     public static MemberEntity fromModel(Member member) {
         MemberEntity memberEntity = new MemberEntity();

@@ -37,7 +37,7 @@ public class MemberStatusController {
         rabbitTemplate.convertAndSend("amq.topic", "direct.rooms." + roomId + ".status", roomMemberStatusDTO);
     }
 
-    @MessageMapping("/friendship/status/member1/{memberId1}/member2/{memberId2}")
+    @MessageMapping("friendship/status/member1/{memberId1}/member2/{memberId2}")
     public void friendOnlineStatus(@DestinationVariable Long memberId1, Long memberId2,
                                    MemberStatus memberStatus) {
 
@@ -53,13 +53,13 @@ public class MemberStatusController {
 
     @MessageMapping("members/status/heartbeat")
     public void statusHeartbeat(RoomMemberStatusDTO roomMemberStatusDTO) {
-
         // 10초 간격으로 접속 상태 heartbeat
         HashMap<String, String> userStatus = new HashMap<>();
         LocalDateTime now = LocalDateTime.now();
         userStatus.put("status", roomMemberStatusDTO.getStatus());
         userStatus.put("lastActive", now.toString());
 
+        log.info("now={}", now);
         redisTemplate.opsForHash().putAll("memberId:" + roomMemberStatusDTO.getMemberId(), userStatus);
     }
 }

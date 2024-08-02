@@ -33,4 +33,9 @@ public class MemberRepositoryImpl implements MemberRepository {
     public Boolean existsByEmailOrUsername(String email, String username) {
         return memberJpaRepository.existsByEmailOrUsername(email, username);
     }
+
+    @Override
+    public Optional<Member> findById(Long id) {
+        return memberJpaRepository.findById(id).map(MemberEntity::toModel);
+    }
 }

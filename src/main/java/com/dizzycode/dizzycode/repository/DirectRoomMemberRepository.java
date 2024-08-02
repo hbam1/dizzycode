@@ -18,7 +18,7 @@ public interface DirectRoomMemberRepository extends JpaRepository<DMRoomMember, 
     @Query("SELECT rm.room FROM DMRoomMember rm WHERE rm.roomMemberId.memberId = :memberId")
     List<DirectMessageRoom> findRoomsByMemberId(@Param("memberId") Long memberID);
 
-    @Query("SELECT rm.member FROM DMRoomMember rm WHERE rm.roomMemberId.roomId = :roomId")
+    @Query("SELECT rm.memberEntity FROM DMRoomMember rm WHERE rm.roomMemberId.roomId = :roomId")
     List<MemberEntity> findMembersByRoomId(@Param("roomId") Long roomId);
 
     RoomMember findRoomMemberByRoomMemberId(RoomMemberId roomMemberId);

@@ -1,7 +1,6 @@
 package com.dizzycode.dizzycode.dto.friendship;
 
-import com.dizzycode.dizzycode.domain.friendship.Friendship;
-import com.dizzycode.dizzycode.domain.friendship.FriendshipId;
+import com.dizzycode.dizzycode.friendship.domain.FriendshipStatus;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,5 +10,5 @@ public class FriendshipDetailDTO {
 
     private Long friendId;
     private String friendName;
-    private Friendship.FriendshipStatus currentStatus;
+    private FriendshipStatus currentStatus;
 }
