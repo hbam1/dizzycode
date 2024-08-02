@@ -25,7 +25,7 @@ public class DirectMessageController {
     private final DirectMessageService directMessageService;
     private final RabbitTemplate rabbitTemplate;
 
-    @MessageMapping("/direct/room/{roomId}")
+    @MessageMapping("direct.room.{roomId}")
     public MessageDetailDTO messageCreate(@DestinationVariable Long roomId,
                                           MessageCreateDTO messageCreateDTO) throws Exception {
         // 클라이언트에 리턴할 데이터
