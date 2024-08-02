@@ -1,9 +1,10 @@
-package com.dizzycode.dizzycode.service.jwt;
+package com.dizzycode.dizzycode.member.service;
 
 
-import com.dizzycode.dizzycode.domain.Member;
-import com.dizzycode.dizzycode.dto.jwt.CustomUserDetails;
-import com.dizzycode.dizzycode.repository.MemberRepository;
+import com.dizzycode.dizzycode.exception.member.NoMemberException;
+import com.dizzycode.dizzycode.member.domain.Member;
+import com.dizzycode.dizzycode.member.domain.dto.CustomUserDetails;
+import com.dizzycode.dizzycode.member.service.port.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -19,12 +20,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
-        Member member = memberRepository.findByEmail(email);
-
-        if (member == null) {
-
-            throw new UsernameNotFoundException("사용자를 찾을 수 없습니다.");
-        }
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new NoMemberException("존재하지 않는 회원입니다."));
 
         return new CustomUserDetails(member);
     }

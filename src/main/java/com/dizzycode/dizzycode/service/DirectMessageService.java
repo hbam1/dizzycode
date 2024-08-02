@@ -1,16 +1,14 @@
 package com.dizzycode.dizzycode.service;
 
 import com.dizzycode.dizzycode.domain.DirectMessage;
-import com.dizzycode.dizzycode.domain.Member;
-import com.dizzycode.dizzycode.dto.message.DirectMessageDetailDTO;
+import com.dizzycode.dizzycode.member.infrastructure.MemberEntity;
 import com.dizzycode.dizzycode.dto.message.MessageCreateDTO;
 import com.dizzycode.dizzycode.dto.message.MessageDetailDTO;
 import com.dizzycode.dizzycode.repository.DirectMessageRepository;
-import com.dizzycode.dizzycode.repository.MemberRepository;
+import com.dizzycode.dizzycode.member.infrastructure.MemberJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -21,12 +19,12 @@ import java.util.stream.Collectors;
 public class DirectMessageService {
 
     private final DirectMessageRepository directMessageRepository;
-    private final MemberRepository memberRepository;
+    private final MemberJpaRepository memberJpaRepository;
 
     public MessageDetailDTO saveDirectMessage(MessageCreateDTO messageCreateDTO, Long roomId) {
         Long senderId = messageCreateDTO.getSenderId();
         String content = messageCreateDTO.getContent();
-        Optional<Member> member = memberRepository.findById(senderId);
+        Optional<MemberEntity> member = memberJpaRepository.findById(senderId);
 
         DirectMessage directMessage = new DirectMessage();
         directMessage.setContent(content);

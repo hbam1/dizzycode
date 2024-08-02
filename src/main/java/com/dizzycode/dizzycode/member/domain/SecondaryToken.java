@@ -1,4 +1,4 @@
-package com.dizzycode.dizzycode.dto.jwt;
+package com.dizzycode.dizzycode.member.domain;
 
 import lombok.Getter;
 import lombok.Setter;

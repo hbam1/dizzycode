@@ -1,11 +1,8 @@
 package com.dizzycode.dizzycode.service;
 
-import com.dizzycode.dizzycode.domain.DirectMessageRoom;
-import com.dizzycode.dizzycode.domain.Member;
+import com.dizzycode.dizzycode.member.infrastructure.MemberEntity;
 import com.dizzycode.dizzycode.domain.friendship.Friendship;
 import com.dizzycode.dizzycode.domain.friendship.FriendshipId;
-import com.dizzycode.dizzycode.domain.roommember.DMRoomMember;
-import com.dizzycode.dizzycode.domain.roommember.RoomMemberId;
 import com.dizzycode.dizzycode.dto.friendship.FriendshipDetailDTO;
 import com.dizzycode.dizzycode.dto.friendship.FriendshipRemoveDTO;
 import com.dizzycode.dizzycode.dto.room.DMRoomCreateDTO;
@@ -13,8 +10,7 @@ import com.dizzycode.dizzycode.exception.friendship.FriendshipAlreadyExistsExcep
 import com.dizzycode.dizzycode.exception.friendship.InvalidFriendshipRequestException;
 import com.dizzycode.dizzycode.repository.DirectMessageRoomRepository;
 import com.dizzycode.dizzycode.repository.FriendshipRepository;
-import com.dizzycode.dizzycode.repository.MemberRepository;
-import jakarta.persistence.EntityNotFoundException;
+import com.dizzycode.dizzycode.member.infrastructure.MemberJpaRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,7 +24,7 @@ public class FriendshipService {
 
     private final FriendshipRepository friendshipRepository;
     private final DirectMessageRoomRepository directMessageRoomRepository;
-    private final MemberRepository memberRepository;
+    private final MemberJpaRepository memberJpaRepository;
     private final DirectMessageRoomService directMessageRoomService;
 
     public List<FriendshipDetailDTO> friendshipList(Long memberId) {
@@ -41,7 +37,7 @@ public class FriendshipService {
                     FriendshipDetailDTO friendshipDetailDTO = new FriendshipDetailDTO();
                     Long friendId = findFriendId(memberId, friendship);
                     friendshipDetailDTO.setFriendId(friendId);
-                    Optional<Member> optionalMember = memberRepository.findById(friendId);
+                    Optional<MemberEntity> optionalMember = memberJpaRepository.findById(friendId);
                     optionalMember.ifPresent(member -> {
                         String friendName = member.getUsername();
                         friendshipDetailDTO.setFriendName(friendName);
@@ -59,12 +55,12 @@ public class FriendshipService {
         List<Friendship> friendships = friendshipRepository.findFriendshipsByMemberId(memberId);
 
         List<FriendshipDetailDTO> friendshipDetailList = friendships.stream().filter(friendship -> friendship.getStatus() == Friendship.FriendshipStatus.PENDING &&
-                        friendship.getMember2().getId().equals(memberId))
+                        friendship.getMemberEntity2().getId().equals(memberId))
                 .map(friendship -> {
 
                     FriendshipDetailDTO friendshipDetailDTO = new FriendshipDetailDTO();
-                    friendshipDetailDTO.setFriendId(friendship.getMember1().getId());
-                    friendshipDetailDTO.setFriendName(friendship.getMember1().getUsername());
+                    friendshipDetailDTO.setFriendId(friendship.getMemberEntity1().getId());
+                    friendshipDetailDTO.setFriendName(friendship.getMemberEntity1().getUsername());
                     friendshipDetailDTO.setCurrentStatus(Friendship.FriendshipStatus.PENDING);
                     return friendshipDetailDTO;
                 }
@@ -88,26 +84,26 @@ public class FriendshipService {
 
         Friendship friendship = new Friendship();
         friendship.setId(friendshipId1);
-        Optional<Member> optionalMember1 = memberRepository.findById(senderId);
-        Optional<Member> optionalMember2 = memberRepository.findById(receiverId);
+        Optional<MemberEntity> optionalMember1 = memberJpaRepository.findById(senderId);
+        Optional<MemberEntity> optionalMember2 = memberJpaRepository.findById(receiverId);
         if (optionalMember1.isPresent() && optionalMember2.isPresent()) {
-            friendship.setMember1(optionalMember1.get());
-            friendship.setMember2(optionalMember2.get());
+            friendship.setMemberEntity1(optionalMember1.get());
+            friendship.setMemberEntity2(optionalMember2.get());
         }
 
         friendshipRepository.save(friendship);
 
         FriendshipDetailDTO friendshipDetail = new FriendshipDetailDTO();
-        friendshipDetail.setFriendId(friendship.getMember2().getId());
+        friendshipDetail.setFriendId(friendship.getMemberEntity2().getId());
         friendshipDetail.setCurrentStatus(friendship.getStatus());
-        friendshipDetail.setFriendName(friendship.getMember2().getUsername());
+        friendshipDetail.setFriendName(friendship.getMemberEntity2().getUsername());
 
         return friendshipDetail;
     }
 
     public FriendshipDetailDTO requestFriendshipByUsername(Long senderId, String username) {
 
-        Member friend = memberRepository.findByUsername(username);
+        MemberEntity friend = memberJpaRepository.findByUsername(username);
         Long friendId = friend.getId();
 
         if (senderId.equals(friendId)) {
@@ -123,18 +119,18 @@ public class FriendshipService {
 
         Friendship friendship = new Friendship();
         friendship.setId(friendshipId1);
-        Optional<Member> optionalMember1 = memberRepository.findById(senderId);
+        Optional<MemberEntity> optionalMember1 = memberJpaRepository.findById(senderId);
         if (optionalMember1.isPresent()) {
-            friendship.setMember1(optionalMember1.get());
-            friendship.setMember2(friend);
+            friendship.setMemberEntity1(optionalMember1.get());
+            friendship.setMemberEntity2(friend);
         }
 
         friendshipRepository.save(friendship);
 
         FriendshipDetailDTO friendshipDetail = new FriendshipDetailDTO();
-        friendshipDetail.setFriendId(friendship.getMember2().getId());
+        friendshipDetail.setFriendId(friendship.getMemberEntity2().getId());
         friendshipDetail.setCurrentStatus(friendship.getStatus());
-        friendshipDetail.setFriendName(friendship.getMember2().getUsername());
+        friendshipDetail.setFriendName(friendship.getMemberEntity2().getUsername());
 
         return friendshipDetail;
     }
@@ -165,14 +161,14 @@ public class FriendshipService {
         friendship.setStatus(Friendship.FriendshipStatus.ACCEPTED);
 
         FriendshipDetailDTO friendshipDetail = new FriendshipDetailDTO();
-        friendshipDetail.setFriendId(friendship.getMember2().getId());
+        friendshipDetail.setFriendId(friendship.getMemberEntity2().getId());
         friendshipDetail.setCurrentStatus(friendship.getStatus());
-        friendshipDetail.setFriendName(friendship.getMember2().getUsername());
+        friendshipDetail.setFriendName(friendship.getMemberEntity2().getUsername());
 
         DMRoomCreateDTO dmRoomCreateDTO = new DMRoomCreateDTO();
         ArrayList<String> usernames = new ArrayList<>();
-        usernames.add(friendship.getMember1().getUsername());
-        usernames.add(friendship.getMember2().getUsername());
+        usernames.add(friendship.getMemberEntity1().getUsername());
+        usernames.add(friendship.getMemberEntity2().getUsername());
         dmRoomCreateDTO.setRoomName("");
         dmRoomCreateDTO.setUserNames(usernames);
 
@@ -192,9 +188,9 @@ public class FriendshipService {
         friendship.setStatus(Friendship.FriendshipStatus.REJECTED);
 
         FriendshipDetailDTO friendshipDetail = new FriendshipDetailDTO();
-        friendshipDetail.setFriendId(friendship.getMember2().getId());
+        friendshipDetail.setFriendId(friendship.getMemberEntity2().getId());
         friendshipDetail.setCurrentStatus(friendship.getStatus());
-        friendshipDetail.setFriendName(friendship.getMember2().getUsername());
+        friendshipDetail.setFriendName(friendship.getMemberEntity2().getUsername());
 
         return friendshipDetail;
     }
@@ -202,8 +198,8 @@ public class FriendshipService {
     public Long findFriendId(Long memberId, Friendship friendship) {
 
         Long friendId;
-        Long memberId1 = friendship.getMember1().getId();
-        Long memberId2 = friendship.getMember2().getId();
+        Long memberId1 = friendship.getMemberEntity1().getId();
+        Long memberId2 = friendship.getMemberEntity2().getId();
 
         if (memberId.equals(memberId1)) {
             friendId = memberId2;

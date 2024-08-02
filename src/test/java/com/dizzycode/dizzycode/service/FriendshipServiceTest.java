@@ -1,14 +1,14 @@
 package com.dizzycode.dizzycode.service;
 
 import com.dizzycode.dizzycode.domain.DirectMessageRoom;
-import com.dizzycode.dizzycode.domain.Member;
+import com.dizzycode.dizzycode.member.infrastructure.MemberEntity;
 import com.dizzycode.dizzycode.domain.friendship.Friendship;
 import com.dizzycode.dizzycode.domain.friendship.FriendshipId;
 import com.dizzycode.dizzycode.dto.friendship.FriendshipDetailDTO;
 import com.dizzycode.dizzycode.dto.friendship.FriendshipRemoveDTO;
 import com.dizzycode.dizzycode.repository.DirectMessageRoomRepository;
 import com.dizzycode.dizzycode.repository.FriendshipRepository;
-import com.dizzycode.dizzycode.repository.MemberRepository;
+import com.dizzycode.dizzycode.member.infrastructure.MemberJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -30,7 +30,7 @@ public class FriendshipServiceTest {
     private DirectMessageRoomRepository directMessageRoomRepository;
 
     @Mock
-    private MemberRepository memberRepository;
+    private MemberJpaRepository memberJpaRepository;
 
     @InjectMocks
     private FriendshipService friendshipService;
@@ -44,13 +44,13 @@ public class FriendshipServiceTest {
     void testFriendshipList() {
         Long memberId = 1L;
         Friendship friendship = new Friendship();
-        friendship.setMember1(new Member());
-        friendship.setMember2(new Member());
+        friendship.setMemberEntity1(new MemberEntity());
+        friendship.setMemberEntity2(new MemberEntity());
         friendship.setStatus(Friendship.FriendshipStatus.ACCEPTED);
         List<Friendship> friendships = List.of(friendship);
 
         when(friendshipRepository.findFriendshipsByMemberId(memberId)).thenReturn(friendships);
-        when(memberRepository.findById(any(Long.class))).thenReturn(Optional.of(new Member()));
+        when(memberJpaRepository.findById(any(Long.class))).thenReturn(Optional.of(new MemberEntity()));
 
         List<FriendshipDetailDTO> result = friendshipService.friendshipList(memberId);
 
@@ -63,8 +63,8 @@ public class FriendshipServiceTest {
         Long senderId = 1L;
         Long receiverId = 2L;
 
-        when(memberRepository.findById(senderId)).thenReturn(Optional.of(new Member()));
-        when(memberRepository.findById(receiverId)).thenReturn(Optional.of(new Member()));
+        when(memberJpaRepository.findById(senderId)).thenReturn(Optional.of(new MemberEntity()));
+        when(memberJpaRepository.findById(receiverId)).thenReturn(Optional.of(new MemberEntity()));
         when(friendshipRepository.existsById(any(FriendshipId.class))).thenReturn(false);
 
         FriendshipDetailDTO result = friendshipService.requestFriendship(senderId, receiverId);
@@ -78,14 +78,14 @@ public class FriendshipServiceTest {
         Long memberId1 = 1L;
         Long memberId2 = 2L;
         Friendship friendship = new Friendship();
-        friendship.setMember1(new Member());
-        friendship.setMember2(new Member());
+        friendship.setMemberEntity1(new MemberEntity());
+        friendship.setMemberEntity2(new MemberEntity());
         friendship.setStatus(Friendship.FriendshipStatus.PENDING);
 
         when(friendshipRepository.findFriendshipById(memberId1, memberId2)).thenReturn(friendship);
         when(directMessageRoomRepository.save(any(DirectMessageRoom.class))).thenReturn(new DirectMessageRoom());
-        when(memberRepository.findById(memberId1)).thenReturn(Optional.of(new Member()));
-        when(memberRepository.findById(memberId2)).thenReturn(Optional.of(new Member()));
+        when(memberJpaRepository.findById(memberId1)).thenReturn(Optional.of(new MemberEntity()));
+        when(memberJpaRepository.findById(memberId2)).thenReturn(Optional.of(new MemberEntity()));
 
         FriendshipDetailDTO result = friendshipService.acceptFriendshipRequest(memberId1, memberId2);
 

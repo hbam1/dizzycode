@@ -1,7 +1,8 @@
-package com.dizzycode.dizzycode.service.jwt;
+package com.dizzycode.dizzycode.member.service;
 
-
-import com.dizzycode.dizzycode.dto.member.MemberDetailDTO;
+import com.dizzycode.dizzycode.member.controller.response.MemberCreateResponse;
+import com.dizzycode.dizzycode.member.domain.Member;
+import com.dizzycode.dizzycode.service.jwt.JWTUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.Cookie;
@@ -74,13 +75,15 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
         valueOperations.set(refresh, email, 86400000L, TimeUnit.MILLISECONDS);
 
-        MemberDetailDTO memberDetailDTO = new MemberDetailDTO();
-        memberDetailDTO.setId(id);
-        memberDetailDTO.setEmail(email);
-        memberDetailDTO.setUsername(username);
+        Member member = Member.builder()
+                .id(id)
+                .email(email)
+                .username(username)
+                .build();
+        MemberCreateResponse memberCreateResponse = MemberCreateResponse.from(member);
 
         ObjectMapper objectMapper = new ObjectMapper();
-        String jsonResponse = objectMapper.writeValueAsString(memberDetailDTO);
+        String jsonResponse = objectMapper.writeValueAsString(memberCreateResponse);
 
         //응답 설정
         response.setHeader("Authorization", "Bearer " + access);

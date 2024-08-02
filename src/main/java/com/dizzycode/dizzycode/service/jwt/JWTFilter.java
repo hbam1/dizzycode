@@ -1,8 +1,8 @@
 package com.dizzycode.dizzycode.service.jwt;
 
-import com.dizzycode.dizzycode.domain.Member;
+import com.dizzycode.dizzycode.member.infrastructure.MemberEntity;
 import com.dizzycode.dizzycode.domain.enumerate.RoleEnum;
-import com.dizzycode.dizzycode.dto.jwt.CustomUserDetails;
+import com.dizzycode.dizzycode.member.domain.dto.CustomUserDetails;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -86,14 +86,14 @@ public class JWTFilter extends OncePerRequestFilter {
         RoleEnum role = RoleEnum.fromString(roleString);
 
         //member를 생성하여 값 set
-        Member member = new Member();
-        member.setUsername("temp");
-        member.setEmail(email);
-        member.setPassword("temppassword");
-        member.setRole(role);
+        MemberEntity memberEntity = new MemberEntity();
+        memberEntity.setUsername("temp");
+        memberEntity.setEmail(email);
+        memberEntity.setPassword("temppassword");
+        memberEntity.setRole(role);
 
         //UserDetails에 회원 정보 객체 담기
-        CustomUserDetails memberDetails = new CustomUserDetails(member);
+        CustomUserDetails memberDetails = new CustomUserDetails(memberEntity);
 
         //스프링 시큐리티 인증 토큰 생성
         Authentication authToken = new UsernamePasswordAuthenticationToken(memberDetails, null, memberDetails.getAuthorities());

@@ -1,6 +1,6 @@
 package com.dizzycode.dizzycode.domain.friendship;
 
-import com.dizzycode.dizzycode.domain.Member;
+import com.dizzycode.dizzycode.member.infrastructure.MemberEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,12 +23,12 @@ public class Friendship {
     @ManyToOne
     @MapsId("memberId1")
     @JoinColumn(name = "member_id1", updatable = false)
-    private Member member1;
+    private MemberEntity memberEntity1;
 
     @ManyToOne
     @MapsId("memberId2")
     @JoinColumn(name = "member_id2", updatable = false)
-    private Member member2;
+    private MemberEntity memberEntity2;
 
     public enum FriendshipStatus {
         PENDING,

@@ -1,5 +1,6 @@
-package com.dizzycode.dizzycode.service.jwt;
+package com.dizzycode.dizzycode.member.service;
 
+import com.dizzycode.dizzycode.service.jwt.JWTUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -14,9 +15,6 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 
 @RequiredArgsConstructor
 public class CustomLogoutFilter extends GenericFilterBean {

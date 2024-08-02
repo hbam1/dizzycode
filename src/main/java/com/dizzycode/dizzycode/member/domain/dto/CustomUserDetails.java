@@ -1,6 +1,6 @@
-package com.dizzycode.dizzycode.dto.jwt;
+package com.dizzycode.dizzycode.member.domain.dto;
 
-import com.dizzycode.dizzycode.domain.Member;
+import com.dizzycode.dizzycode.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

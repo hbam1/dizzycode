@@ -1,19 +1,15 @@
 package com.dizzycode.dizzycode.service;
 
 import com.dizzycode.dizzycode.domain.DirectMessageRoom;
-import com.dizzycode.dizzycode.domain.Member;
+import com.dizzycode.dizzycode.member.infrastructure.MemberEntity;
 import com.dizzycode.dizzycode.domain.roommember.DMRoomMember;
-import com.dizzycode.dizzycode.domain.roommember.RoomMember;
 import com.dizzycode.dizzycode.domain.roommember.RoomMemberId;
-import com.dizzycode.dizzycode.dto.member.MemberStatusDTO;
+import com.dizzycode.dizzycode.member.domain.MemberStatus;
 import com.dizzycode.dizzycode.dto.room.DMRoomCreateDTO;
-import com.dizzycode.dizzycode.dto.room.DMRoomCreateResponseDTO;
 import com.dizzycode.dizzycode.dto.room.DMRoomDetailDTO;
-import com.dizzycode.dizzycode.dto.room.RoomDetailDTO;
 import com.dizzycode.dizzycode.repository.DirectMessageRoomRepository;
 import com.dizzycode.dizzycode.repository.DirectRoomMemberRepository;
-import com.dizzycode.dizzycode.repository.MemberRepository;
-import com.dizzycode.dizzycode.repository.RoomMemberRepository;
+import com.dizzycode.dizzycode.member.infrastructure.MemberJpaRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisCallback;
@@ -31,7 +27,7 @@ public class DirectMessageRoomService {
 
     private final DirectMessageRoomRepository directMessageRoomRepository;
     private final DirectRoomMemberRepository directRoomMemberRepository;
-    private final MemberRepository memberRepository;
+    private final MemberJpaRepository memberJpaRepository;
     private final RedisTemplate<String, String> redisTemplate;
 
     public DMRoomDetailDTO createDMRoom(DMRoomCreateDTO dmRoomCreateDTO) {
@@ -50,9 +46,9 @@ public class DirectMessageRoomService {
 
                 for (String username : dmRoomCreateDTO.getUserNames()) {
                     DMRoomMember roomMember = new DMRoomMember();
-                    Member memberEntity = memberRepository.findByUsername(username);
+                    MemberEntity memberEntity = memberJpaRepository.findByUsername(username);
                     RoomMemberId roomMemberId = new RoomMemberId(memberEntity.getId(), room.getRoomId());
-                    roomMember.setMember(memberEntity);
+                    roomMember.setMemberEntity(memberEntity);
                     roomMember.setRoomMemberId(roomMemberId);
                     roomMember.setRoom(room);
 
@@ -85,9 +81,9 @@ public class DirectMessageRoomService {
 
         for (String username : dmRoomCreateDTO.getUserNames()) {
             DMRoomMember roomMember = new DMRoomMember();
-            Member memberEntity = memberRepository.findByUsername(username);
+            MemberEntity memberEntity = memberJpaRepository.findByUsername(username);
             RoomMemberId roomMemberId = new RoomMemberId(memberEntity.getId(), room.getRoomId());
-            roomMember.setMember(memberEntity);
+            roomMember.setMemberEntity(memberEntity);
             roomMember.setRoomMemberId(roomMemberId);
             roomMember.setRoom(room);
 
@@ -113,9 +109,9 @@ public class DirectMessageRoomService {
     }
 
     public List<DMRoomDetailDTO> roomList() {
-        Member member = getMemberFromSession();
+        MemberEntity memberEntity = getMemberFromSession();
 
-        List<DMRoomDetailDTO> rooms = directRoomMemberRepository.findRoomsByMemberId(member.getId()).stream()
+        List<DMRoomDetailDTO> rooms = directRoomMemberRepository.findRoomsByMemberId(memberEntity.getId()).stream()
                 .map(room -> {
                     DMRoomDetailDTO roomDetailDTO = new DMRoomDetailDTO();
                     roomDetailDTO.setRoomId(room.getRoomId());
@@ -128,7 +124,7 @@ public class DirectMessageRoomService {
                     roomDetailDTO.setUserNames(getUsernamesFromSet(room.getRoomMembers(), getMemberFromSession().getUsername()));
 
                     if (room.getRoomName().isEmpty()) {
-                        roomDetailDTO.setTemporaryRoomName(generateTemporaryName(room.getRoomMembers(), member.getUsername()));
+                        roomDetailDTO.setTemporaryRoomName(generateTemporaryName(room.getRoomMembers(), memberEntity.getUsername()));
                     }
 
                     return roomDetailDTO;
@@ -173,18 +169,18 @@ public class DirectMessageRoomService {
         DirectMessageRoom room = directMessageRoomRepository.findById(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 방을 찾을 수 없습니다."));
 
-        Member member = memberRepository.findByUsername(username);
-        if (member == null) {
+        MemberEntity memberEntity = memberJpaRepository.findByUsername(username);
+        if (memberEntity == null) {
             throw new IllegalArgumentException("해당 유저를 찾을 수 없습니다.");
         }
 
-        if (room.getRoomMembers().stream().anyMatch(dmRoomMember -> dmRoomMember.getMember().equals(member))) {
+        if (room.getRoomMembers().stream().anyMatch(dmRoomMember -> dmRoomMember.getMemberEntity().equals(memberEntity))) {
             throw new IllegalArgumentException("이미 방에 속해 있는 멤버입니다.");
         }
 
         if (!room.isGroupChat()) {
             List<String> usernames = room.getRoomMembers().stream().map(user ->
-                user.getMember().getUsername()).collect(Collectors.toCollection(ArrayList::new));
+                user.getMemberEntity().getUsername()).collect(Collectors.toCollection(ArrayList::new));
             usernames.add(username);
 
             DMRoomCreateDTO dmRoomCreateDTO = new DMRoomCreateDTO();
@@ -196,8 +192,8 @@ public class DirectMessageRoomService {
 
         } else {
             DMRoomMember roomMember = new DMRoomMember();
-            RoomMemberId roomMemberId = new RoomMemberId(member.getId(), room.getRoomId());
-            roomMember.setMember(member);
+            RoomMemberId roomMemberId = new RoomMemberId(memberEntity.getId(), room.getRoomId());
+            roomMember.setMemberEntity(memberEntity);
             roomMember.setRoomMemberId(roomMemberId);
             roomMember.setRoom(room);
             directRoomMemberRepository.save(roomMember);
@@ -221,13 +217,13 @@ public class DirectMessageRoomService {
         DirectMessageRoom room = directMessageRoomRepository.findById(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 방을 찾을 수 없습니다."));
 
-        Member member = memberRepository.findByUsername(username);
-        if (member == null) {
+        MemberEntity memberEntity = memberJpaRepository.findByUsername(username);
+        if (memberEntity == null) {
             throw new IllegalArgumentException("해당 사용자를 찾을 수 없습니다.");
         }
 
         DMRoomMember targetMember = room.getRoomMembers().stream()
-                .filter(dmRoomMember -> dmRoomMember.getMember().equals(member))
+                .filter(dmRoomMember -> dmRoomMember.getMemberEntity().equals(memberEntity))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("해당 멤버가 방에 속해 있지 않습니다."));
 
@@ -236,11 +232,11 @@ public class DirectMessageRoomService {
         room.getRoomMembers().remove(targetMember);
     }
 
-    public List<MemberStatusDTO> getRoomMembers(Long roomId) {
-        List<Member> members = directRoomMemberRepository.findMembersByRoomId(roomId);
+    public List<MemberStatus> getRoomMembers(Long roomId) {
+        List<MemberEntity> memberEntities = directRoomMemberRepository.findMembersByRoomId(roomId);
 
         List<Object> pipelineResults = redisTemplate.executePipelined((RedisCallback<Object>) connection -> {
-            for (Member member : members) {
+            for (MemberEntity member : memberEntities) {
                 connection.hashCommands().hGet(("memberId:" + member.getId()).getBytes(), "status".getBytes());
             }
 
@@ -248,42 +244,42 @@ public class DirectMessageRoomService {
         });
 
         Map<Long, String> memberStatusMap = new HashMap<>();
-        for (int i = 0; i < members.size(); i++) {
-            memberStatusMap.put(members.get(i).getId(), (String) pipelineResults.get(i));
+        for (int i = 0; i < memberEntities.size(); i++) {
+            memberStatusMap.put(memberEntities.get(i).getId(), (String) pipelineResults.get(i));
         }
 
-        List<MemberStatusDTO> memberStatusDTOs = members.stream()
+        List<MemberStatus> memberStatuses = memberEntities.stream()
                 .map(member -> {
-                    MemberStatusDTO memberStatusDTO = new MemberStatusDTO();
-                    memberStatusDTO.setUsername(member.getUsername());
+                    MemberStatus memberStatus = new MemberStatus();
+                    memberStatus.setUsername(member.getUsername());
                     String status = memberStatusMap.get(member.getId());
-                    memberStatusDTO.setStatus(status);
-                    return memberStatusDTO;
+                    memberStatus.setStatus(status);
+                    return memberStatus;
                 })
                 .collect(Collectors.toList());
 
-        return memberStatusDTOs;
+        return memberStatuses;
     }
 
     private String generateFriendshipId(List<String> usernames) {
         String friendshipId = usernames.stream().map(username ->
-            memberRepository.findByUsername(username).getId()).sorted(Comparator.naturalOrder()).map(String::valueOf).collect(Collectors.joining("-"));
+            memberJpaRepository.findByUsername(username).getId()).sorted(Comparator.naturalOrder()).map(String::valueOf).collect(Collectors.joining("-"));
 
         return friendshipId;
     }
 
-    private Member getMemberFromSession() {
+    private MemberEntity getMemberFromSession() {
         // 현재 인증된 사용자의 인증 객체를 가져옴
         String[] memberInfo = SecurityContextHolder.getContext().getAuthentication().getName().split(" ");
         String email = memberInfo[1];
 
-        return memberRepository.findByEmail(email);
+        return memberJpaRepository.findByEmail(email);
     }
 
     private String generateTemporaryName(Set<DMRoomMember> roomMemberSet, String myName) {
 
         List<String> usernames = roomMemberSet.stream()
-                .map(dmRoomMember -> dmRoomMember.getMember().getUsername())
+                .map(dmRoomMember -> dmRoomMember.getMemberEntity().getUsername())
                 .filter(username -> !username.equals(myName))
                 .sorted()
                 .collect(Collectors.toList());
@@ -292,7 +288,7 @@ public class DirectMessageRoomService {
 
     private List<String> getUsernamesFromSet(Set<DMRoomMember> roomMemberSet, String myName) {
         List<String> usernames = roomMemberSet.stream()
-                .map(dmRoomMember -> dmRoomMember.getMember().getUsername())
+                .map(dmRoomMember -> dmRoomMember.getMemberEntity().getUsername())
                 .filter(username -> !username.equals(myName))
                 .sorted()
                 .collect(Collectors.toList());

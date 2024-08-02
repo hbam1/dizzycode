@@ -2,16 +2,10 @@ package com.dizzycode.dizzycode.controller;
 
 import com.dizzycode.dizzycode.dto.friendship.FriendshipDetailDTO;
 import com.dizzycode.dizzycode.dto.friendship.FriendshipRemoveDTO;
-import com.dizzycode.dizzycode.dto.member.MemberStatusDTO;
-import com.dizzycode.dizzycode.dto.message.MessageCreateDTO;
-import com.dizzycode.dizzycode.dto.message.MessageDetailDTO;
-import com.dizzycode.dizzycode.dto.message.MessageRoomDTO;
 import com.dizzycode.dizzycode.service.FriendshipService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
-import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

@@ -1,6 +1,6 @@
 package com.dizzycode.dizzycode.domain.roommember;
 
-import com.dizzycode.dizzycode.domain.Member;
+import com.dizzycode.dizzycode.member.infrastructure.MemberEntity;
 import com.dizzycode.dizzycode.domain.Room;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -22,7 +22,7 @@ public class RoomMember {
     @ManyToOne
     @MapsId("memberId")
     @JoinColumn(name = "member_id", updatable = false)
-    private Member member;
+    private MemberEntity memberEntity;
 
     @ManyToOne
     @MapsId("roomId")

@@ -2,17 +2,18 @@ package com.dizzycode.dizzycode.service;
 
 import com.dizzycode.dizzycode.domain.Category;
 import com.dizzycode.dizzycode.domain.Channel;
-import com.dizzycode.dizzycode.domain.Member;
+import com.dizzycode.dizzycode.member.infrastructure.MemberEntity;
 import com.dizzycode.dizzycode.domain.Room;
 import com.dizzycode.dizzycode.domain.roommember.RoomMember;
 import com.dizzycode.dizzycode.domain.roommember.RoomMemberId;
 import com.dizzycode.dizzycode.dto.RoomMemberDetailDTO;
-import com.dizzycode.dizzycode.dto.member.MemberStatusDTO;
+import com.dizzycode.dizzycode.member.domain.MemberStatus;
 import com.dizzycode.dizzycode.dto.room.RoomCreateDTO;
 import com.dizzycode.dizzycode.dto.room.RoomCreateWithCCDTO;
 import com.dizzycode.dizzycode.dto.room.RoomDetailDTO;
 import com.dizzycode.dizzycode.dto.room.RoomRemoveDTO;
 import com.dizzycode.dizzycode.exception.member.NoMemberException;
+import com.dizzycode.dizzycode.member.infrastructure.MemberJpaRepository;
 import com.dizzycode.dizzycode.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +36,7 @@ import java.util.stream.Collectors;
 public class RoomService {
 
     private final RoomRepository roomRepository;
-    private final MemberRepository memberRepository;
+    private final MemberJpaRepository memberJpaRepository;
     private final RoomMemberRepository roomMemberRepository;
     private final CategoryRepository categoryRepository;
     private final ChannelRepository channelRepository;
@@ -44,7 +45,7 @@ public class RoomService {
 
     public RoomCreateWithCCDTO createRoom(RoomCreateDTO roomCreateDTO) {
         // 현재 인증된 사용자의 인증 객체
-        Member member = getMemberFromSession();
+        MemberEntity memberEntity = getMemberFromSession();
 
         // 방 생성
         Room room = new Room();
@@ -54,10 +55,10 @@ public class RoomService {
 
         // 방과 방 주인 설정
         RoomMember roomMember = new RoomMember();
-        RoomMemberId roomMemberId = new RoomMemberId(member.getId(), room.getRoomId());
+        RoomMemberId roomMemberId = new RoomMemberId(memberEntity.getId(), room.getRoomId());
         roomMember.setRoomMemberId(roomMemberId);
         roomMember.setRoom(room);
-        roomMember.setMember(member);
+        roomMember.setMemberEntity(memberEntity);
         roomMember.setManager(true);
         roomMemberRepository.save(roomMember);
 
@@ -123,12 +124,12 @@ public class RoomService {
     }
 
     public List<RoomDetailDTO> roomList() {
-        Member member = getMemberFromSession();
-        if (member == null) {
+        MemberEntity memberEntity = getMemberFromSession();
+        if (memberEntity == null) {
             throw new NoMemberException("존재하지 않는 회원입니다.");
         }
 
-        List<RoomDetailDTO> rooms = roomMemberRepository.findRoomsByMemberId(member.getId()).stream()
+        List<RoomDetailDTO> rooms = roomMemberRepository.findRoomsByMemberId(memberEntity.getId()).stream()
                 .map(room -> {
                     RoomDetailDTO roomDetailDTO = new RoomDetailDTO();
                     roomDetailDTO.setRoomId(room.getRoomId());
@@ -186,14 +187,14 @@ public class RoomService {
     }
 
     public RoomMemberDetailDTO roomIn(Long roomId) {
-        Member member = getMemberFromSession();
+        MemberEntity memberEntity = getMemberFromSession();
         Room room = roomRepository.findByRoomId(roomId);
-        RoomMemberId roomMemberId = new RoomMemberId(member.getId(), roomId);
+        RoomMemberId roomMemberId = new RoomMemberId(memberEntity.getId(), roomId);
 
         RoomMember roomMember = new RoomMember();
         roomMember.setRoomMemberId(roomMemberId);
         roomMember.setRoom(room);
-        roomMember.setMember(member);
+        roomMember.setMemberEntity(memberEntity);
         RoomMember save = roomMemberRepository.save(roomMember);
 
         RoomMemberDetailDTO roomMemberDetailDTO = new RoomMemberDetailDTO();
@@ -203,20 +204,20 @@ public class RoomService {
     }
 
     public boolean roomOut(Long roomId) {
-        Member member = getMemberFromSession();
-        RoomMemberId roomMemberId = new RoomMemberId(member.getId(), roomId);
+        MemberEntity memberEntity = getMemberFromSession();
+        RoomMemberId roomMemberId = new RoomMemberId(memberEntity.getId(), roomId);
         RoomMember roomMember = roomMemberRepository.findRoomMemberByRoomMemberId(roomMemberId);
         roomMemberRepository.delete(roomMember);
 
         return true;
     }
 
-    public List<MemberStatusDTO> getRoomMembers(Long roomId) {
-        List<Member> members = roomMemberRepository.findMembersByRoomId(roomId);
+    public List<MemberStatus> getRoomMembers(Long roomId) {
+        List<MemberEntity> memberEntities = roomMemberRepository.findMembersByRoomId(roomId);
 
         // Redis pipeline을 사용하여 모든 멤버의 상태를 한 번에 가져옴
         List<Object> pipelineResults = redisTemplate.executePipelined((RedisCallback<Object>) connection -> {
-            for (Member member : members) {
+            for (MemberEntity member : memberEntities) {
                 connection.hashCommands().hGet(("memberId:" + member.getId()).getBytes(), "status".getBytes());
             }
 
@@ -225,32 +226,32 @@ public class RoomService {
 
         // Redis 결과를 Map 형태로 저장
         Map<Long, String> memberStatusMap = new HashMap<>();
-        for (int i = 0; i < members.size(); i++) {
-            memberStatusMap.put(members.get(i).getId(), (String) pipelineResults.get(i));
+        for (int i = 0; i < memberEntities.size(); i++) {
+            memberStatusMap.put(memberEntities.get(i).getId(), (String) pipelineResults.get(i));
         }
 
         // 멤버 리스트와 Redis 결과를 조합하여 MemberStatusDTO 리스트 생성
-        List<MemberStatusDTO> memberStatusDTOs = members.stream()
+        List<MemberStatus> memberStatuses = memberEntities.stream()
                 .map(member -> {
-                    MemberStatusDTO memberStatusDTO = new MemberStatusDTO();
-                    memberStatusDTO.setUsername(member.getUsername());
+                    MemberStatus memberStatus = new MemberStatus();
+                    memberStatus.setUsername(member.getUsername());
 
                     // Redis 결과에서 상태를 가져옴
                     String status = memberStatusMap.get(member.getId());
-                    memberStatusDTO.setStatus(status);
+                    memberStatus.setStatus(status);
 
-                    return memberStatusDTO;
+                    return memberStatus;
                 })
                 .collect(Collectors.toList());
 
-        return memberStatusDTOs;
+        return memberStatuses;
     }
 
-    private Member getMemberFromSession() {
+    private MemberEntity getMemberFromSession() {
         // 현재 인증된 사용자의 인증 객체를 가져옴
         String[] memberInfo = SecurityContextHolder.getContext().getAuthentication().getName().split(" ");
         String email = memberInfo[1];
 
-        return memberRepository.findByEmail(email);
+        return memberJpaRepository.findByEmail(email).orElseThrow(() -> new NoMemberException("존재하지 않는 회원입니다."));
     }
 }

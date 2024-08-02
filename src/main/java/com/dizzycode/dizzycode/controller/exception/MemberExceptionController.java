@@ -1,6 +1,7 @@
 package com.dizzycode.dizzycode.controller.exception;
 
-import com.dizzycode.dizzycode.controller.MemberController;
+import com.dizzycode.dizzycode.exception.member.NoMemberException;
+import com.dizzycode.dizzycode.member.controller.MemberController;
 import com.dizzycode.dizzycode.dto.ErrorResult;
 import com.dizzycode.dizzycode.exception.member.ExistMemberException;
 import org.springframework.http.HttpStatus;
@@ -16,5 +17,12 @@ public class MemberExceptionController {
     public ErrorResult illegalExHandle(ExistMemberException e) {
 
         return new ErrorResult("400", e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NoMemberException.class)
+    public ErrorResult canNotFindMemberExHandle(NoMemberException e) {
+
+        return new ErrorResult("404", e.getMessage());
     }
 }
