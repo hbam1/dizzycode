@@ -14,7 +14,7 @@ import java.util.UUID;
 public class DirectMessage {
 
     @Id
-    private final String messageId;
+    private String id;
 
     @Field("member_id")
     private Long memberId;
@@ -33,8 +33,4 @@ public class DirectMessage {
 
     @Field("created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
-
-    public DirectMessage() {
-        this.messageId = UUID.randomUUID().toString();
-    }
 }

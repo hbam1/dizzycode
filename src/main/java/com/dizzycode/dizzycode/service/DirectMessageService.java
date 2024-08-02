@@ -48,7 +48,7 @@ public class DirectMessageService {
         List<MessageDetailDTO> messageList= directMessageRepository.findMessages(roomId, last).stream()
                 .map(message -> {
                     MessageDetailDTO messageDetailDTO = new MessageDetailDTO();
-                    messageDetailDTO.setMessageId(message.getMessageId());
+                    messageDetailDTO.setId(message.getId());
                     messageDetailDTO.setSenderUsername(message.getMemberUsername());
                     messageDetailDTO.setContent(message.getContent());
                     messageDetailDTO.setTimestamp(message.getCreatedAt());
