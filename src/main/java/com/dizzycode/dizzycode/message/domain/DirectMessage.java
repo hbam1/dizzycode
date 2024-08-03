@@ -14,7 +14,7 @@ import java.util.UUID;
 public class DirectMessage {
 
     @Id
-    private String messageId;
+    private String id;
 
     @Field("member_id")
     private Long memberId;
