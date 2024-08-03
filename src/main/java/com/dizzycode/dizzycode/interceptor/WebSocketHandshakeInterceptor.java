@@ -50,7 +50,7 @@ public class WebSocketHandshakeInterceptor implements HandshakeInterceptor {
             userStatus.put("lastActive", now.toString());
 
             // userStatus 맵을 "user:{memberId}" 해시에 저장 (기존 값이 있다면 업데이트)
-            redisTemplate.opsForHash().putAll("member:" + memberId, userStatus);
+            redisTemplate.opsForHash().putAll("memberId:" + memberId, userStatus);
         }
     }
 }

@@ -1,8 +1,8 @@
 package com.dizzycode.dizzycode.member.service;
 
 import com.dizzycode.dizzycode.member.domain.SecondaryToken;
-import com.dizzycode.dizzycode.exception.member.ExistMemberException;
-import com.dizzycode.dizzycode.exception.member.NoMemberException;
+import com.dizzycode.dizzycode.member.exception.ExistMemberException;
+import com.dizzycode.dizzycode.member.exception.NoMemberException;
 import com.dizzycode.dizzycode.member.domain.Member;
 import com.dizzycode.dizzycode.member.domain.MemberSignup;
 import com.dizzycode.dizzycode.member.service.port.MemberRepository;

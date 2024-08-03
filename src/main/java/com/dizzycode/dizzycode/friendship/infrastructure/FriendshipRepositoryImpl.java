@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
@@ -17,14 +16,14 @@ public class FriendshipRepositoryImpl implements FriendshipRepository {
     private final FriendshipJpaRepository friendshipJpaRepository;
 
     @Override
-    public Optional<List<Friendship>> findFriendshipsByMemberId(Long memberId) {
-        return Optional.of(friendshipJpaRepository.findFriendshipsByMemberId(memberId).get().stream()
+    public List<Friendship> findFriendshipsByMemberId(Long memberId) {
+        return friendshipJpaRepository.findFriendshipsByMemberId(memberId).stream()
                 .map(friendshipEntity -> {
                     Friendship friendship = friendshipEntity.toModel();
 
                     return friendship;
                 })
-                .toList());
+                .toList();
     }
 
     @Override

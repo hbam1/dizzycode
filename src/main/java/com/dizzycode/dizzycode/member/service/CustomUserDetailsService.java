@@ -1,7 +1,7 @@
 package com.dizzycode.dizzycode.member.service;
 
 
-import com.dizzycode.dizzycode.exception.member.NoMemberException;
+import com.dizzycode.dizzycode.member.exception.NoMemberException;
 import com.dizzycode.dizzycode.member.domain.Member;
 import com.dizzycode.dizzycode.member.domain.dto.CustomUserDetails;
 import com.dizzycode.dizzycode.member.service.port.MemberRepository;

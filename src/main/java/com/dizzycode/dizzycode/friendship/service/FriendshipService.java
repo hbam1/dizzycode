@@ -1,18 +1,18 @@
 package com.dizzycode.dizzycode.friendship.service;
 
-import com.dizzycode.dizzycode.exception.member.NoMemberException;
+import com.dizzycode.dizzycode.member.exception.NoMemberException;
 import com.dizzycode.dizzycode.friendship.domain.Friendship;
 import com.dizzycode.dizzycode.friendship.domain.FriendshipId;
 import com.dizzycode.dizzycode.friendship.domain.FriendshipStatus;
 import com.dizzycode.dizzycode.friendship.service.port.FriendshipRepository;
 import com.dizzycode.dizzycode.member.domain.Member;
-import com.dizzycode.dizzycode.dto.friendship.FriendshipDetailDTO;
-import com.dizzycode.dizzycode.dto.friendship.FriendshipRemoveDTO;
-import com.dizzycode.dizzycode.dto.room.DMRoomCreateDTO;
-import com.dizzycode.dizzycode.exception.friendship.FriendshipAlreadyExistsException;
-import com.dizzycode.dizzycode.exception.friendship.InvalidFriendshipRequestException;
+import com.dizzycode.dizzycode.friendship.domain.dto.FriendshipDetailDTO;
+import com.dizzycode.dizzycode.friendship.domain.dto.FriendshipRemoveDTO;
+import com.dizzycode.dizzycode.room.domain.room.DMRoomCreateDTO;
+import com.dizzycode.dizzycode.friendship.exception.FriendshipAlreadyExistsException;
+import com.dizzycode.dizzycode.friendship.exception.InvalidFriendshipRequestException;
 import com.dizzycode.dizzycode.member.service.port.MemberRepository;
-import com.dizzycode.dizzycode.service.DirectMessageRoomService;
+import com.dizzycode.dizzycode.message.service.DirectMessageRoomService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +33,7 @@ public class FriendshipService {
     @Transactional
     public List<FriendshipDetailDTO> friendshipList(Long memberId) {
 
-        List<Friendship> friendships = friendshipRepository.findFriendshipsByMemberId(memberId).orElse(new ArrayList<Friendship>());
+        List<Friendship> friendships = friendshipRepository.findFriendshipsByMemberId(memberId);
 
         List<FriendshipDetailDTO> friendshipDetailList = friendships.stream().filter(friendship -> friendship.getStatus() == FriendshipStatus.ACCEPTED)
                 .map(friendship -> {
@@ -55,7 +55,7 @@ public class FriendshipService {
 
     @Transactional
     public List<FriendshipDetailDTO> friendshipPendingList(Long memberId) {
-        List<Friendship> friendships = friendshipRepository.findFriendshipsByMemberId(memberId).orElse(new ArrayList<Friendship>());
+        List<Friendship> friendships = friendshipRepository.findFriendshipsByMemberId(memberId);
 
         List<FriendshipDetailDTO> friendshipDetailList = friendships.stream().filter(friendship -> friendship.getStatus() == FriendshipStatus.PENDING &&
                         friendship.getMember2().getId().equals(memberId))
@@ -94,7 +94,6 @@ public class FriendshipService {
                 .member1(optionalMember1)
                 .member2(optionalMember2)
                 .build();
-
         friendshipRepository.save(friendship);
 
         FriendshipDetailDTO friendshipDetail = new FriendshipDetailDTO();
@@ -105,6 +104,7 @@ public class FriendshipService {
         return friendshipDetail;
     }
 
+    // 친구 요청(username 기반)
     @Transactional
     public FriendshipDetailDTO requestFriendshipByUsername(Long senderId, String username) {
         Member friend = memberRepository.findByUsername(username).orElseThrow(() -> new NoMemberException("존재하지 않는 회원입니다."));
@@ -151,6 +151,7 @@ public class FriendshipService {
     public FriendshipDetailDTO acceptFriendshipRequest(Long memberId1, Long memberId2) throws ClassNotFoundException {
         Friendship friendship = friendshipRepository.findFriendshipById(memberId1, memberId2).orElseThrow(() -> new ClassNotFoundException("친구 관계가 존재하지 않습니다."));
         friendship = friendship.update(FriendshipStatus.ACCEPTED);
+        friendshipRepository.save(friendship);
 
         FriendshipDetailDTO friendshipDetail = new FriendshipDetailDTO();
         friendshipDetail.setFriendId(friendship.getMember2().getId());

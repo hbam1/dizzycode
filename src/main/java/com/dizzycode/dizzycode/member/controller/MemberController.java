@@ -4,7 +4,7 @@ import com.dizzycode.dizzycode.member.controller.response.MemberCreateResponse;
 import com.dizzycode.dizzycode.member.domain.Member;
 import com.dizzycode.dizzycode.member.domain.SecondaryToken;
 import com.dizzycode.dizzycode.member.domain.MemberSignup;
-import com.dizzycode.dizzycode.dto.room.RoomMemberStatusDTO;
+import com.dizzycode.dizzycode.room.domain.room.RoomMemberStatusDTO;
 import com.dizzycode.dizzycode.member.service.MemberService;
 import com.dizzycode.dizzycode.member.service.MemberStatusService;
 import lombok.RequiredArgsConstructor;

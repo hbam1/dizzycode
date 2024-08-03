@@ -1,9 +1,8 @@
 package com.dizzycode.dizzycode.friendship.controller;
 
-import com.dizzycode.dizzycode.friendship.controller.FriendshipController;
-import com.dizzycode.dizzycode.dto.ErrorResult;
-import com.dizzycode.dizzycode.exception.friendship.FriendshipAlreadyExistsException;
-import com.dizzycode.dizzycode.exception.friendship.InvalidFriendshipRequestException;
+import com.dizzycode.dizzycode.common.exception.ErrorResult;
+import com.dizzycode.dizzycode.friendship.exception.FriendshipAlreadyExistsException;
+import com.dizzycode.dizzycode.friendship.exception.InvalidFriendshipRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;

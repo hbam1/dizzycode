@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface FriendshipRepository {
 
-    Optional<List<Friendship>> findFriendshipsByMemberId(Long memberId);
+    List<Friendship> findFriendshipsByMemberId(Long memberId);
     Optional<Friendship> findFriendshipById(Long memberId1, Long memberId2);
     Friendship save(Friendship friendship);
     void delete(Friendship friendship);

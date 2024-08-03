@@ -31,7 +31,6 @@ public class MemberEntity {
 
     public static MemberEntity fromModel(Member member) {
         MemberEntity memberEntity = new MemberEntity();
-        memberEntity.setId(member.getId());
         memberEntity.setEmail(member.getEmail());
         memberEntity.setPassword(member.getPassword());
         memberEntity.setUsername(member.getUsername());

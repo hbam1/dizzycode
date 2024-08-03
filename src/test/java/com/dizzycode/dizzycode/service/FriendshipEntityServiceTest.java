@@ -1,14 +1,14 @@
 package com.dizzycode.dizzycode.service;
 
-import com.dizzycode.dizzycode.domain.DirectMessageRoom;
+import com.dizzycode.dizzycode.message.domain.DirectMessageRoom;
 import com.dizzycode.dizzycode.friendship.domain.FriendshipStatus;
 import com.dizzycode.dizzycode.friendship.service.FriendshipService;
 import com.dizzycode.dizzycode.member.infrastructure.MemberEntity;
 import com.dizzycode.dizzycode.friendship.infrastructure.FriendshipEntity;
 import com.dizzycode.dizzycode.friendship.infrastructure.FriendshipIdEntity;
-import com.dizzycode.dizzycode.dto.friendship.FriendshipDetailDTO;
-import com.dizzycode.dizzycode.dto.friendship.FriendshipRemoveDTO;
-import com.dizzycode.dizzycode.repository.DirectMessageRoomRepository;
+import com.dizzycode.dizzycode.friendship.domain.dto.FriendshipDetailDTO;
+import com.dizzycode.dizzycode.friendship.domain.dto.FriendshipRemoveDTO;
+import com.dizzycode.dizzycode.message.infrastructure.DirectMessageRoomRepository;
 import com.dizzycode.dizzycode.friendship.infrastructure.FriendshipJpaRepository;
 import com.dizzycode.dizzycode.member.infrastructure.MemberJpaRepository;
 import org.junit.jupiter.api.BeforeEach;

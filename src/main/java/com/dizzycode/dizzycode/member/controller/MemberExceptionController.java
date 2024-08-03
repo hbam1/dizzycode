@@ -1,9 +1,8 @@
 package com.dizzycode.dizzycode.member.controller;
 
-import com.dizzycode.dizzycode.exception.member.NoMemberException;
-import com.dizzycode.dizzycode.member.controller.MemberController;
-import com.dizzycode.dizzycode.dto.ErrorResult;
-import com.dizzycode.dizzycode.exception.member.ExistMemberException;
+import com.dizzycode.dizzycode.member.exception.NoMemberException;
+import com.dizzycode.dizzycode.common.exception.ErrorResult;
+import com.dizzycode.dizzycode.member.exception.ExistMemberException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
