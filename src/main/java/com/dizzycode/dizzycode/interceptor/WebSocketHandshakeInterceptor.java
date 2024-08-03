@@ -1,6 +1,6 @@
 package com.dizzycode.dizzycode.interceptor;
 
-import com.dizzycode.dizzycode.service.jwt.JWTUtil;
+import com.dizzycode.dizzycode.common.JWTUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -50,7 +50,7 @@ public class WebSocketHandshakeInterceptor implements HandshakeInterceptor {
             userStatus.put("lastActive", now.toString());
 
             // userStatus 맵을 "user:{memberId}" 해시에 저장 (기존 값이 있다면 업데이트)
-            redisTemplate.opsForHash().putAll("member:" + memberId, userStatus);
+            redisTemplate.opsForHash().putAll("memberId:" + memberId, userStatus);
         }
     }
 }
