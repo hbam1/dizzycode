@@ -49,89 +49,7 @@ public class RoomService {
     // 방 생성
     @Transactional
     public RoomCreateWithCCDTO createRoom(RoomCreateDTO roomCreateDTO) {
-        // 현재 인증된 사용자의 인증 객체
-        Member member = getMemberFromSession();
-
-        // 방 생성
-        Room room = Room.builder()
-                .roomName(roomCreateDTO.getRoomName())
-                .open(roomCreateDTO.isOpen())
-                .build();
-        room = roomRepository.save(room);
-
-        // 방과 방 주인 설정
-        RoomMemberId roomMemberId = new RoomMemberId(member.getId(), room.getRoomId());
-        RoomMember roomMember = RoomMember.builder()
-                .roomMemberId(roomMemberId)
-                .room(room)
-                .member(member)
-                .manager(true)
-                .build();
-        roomMemberRepository.save(roomMember);
-
-        // 카테고리 및 채널 기본 생성 (채팅 카테고리와 음성 카테고리 기본 생성 및 각 카테고리 별 일반 채널 기본 생성)
-        Category category1 = Category.builder()
-                .room(room)
-                .categoryName("채팅 채널")
-                .build();
-        category1 = categoryRepository.save(category1);
-
-        Category category2 = Category.builder()
-                .room(room)
-                .categoryName("음성 채널")
-                .build();
-        category2 = categoryRepository.save(category2);
-
-        Channel channelEntity1 = Channel.builder()
-                .category(category1)
-                .channelName("일반")
-                .channelType(ChannelType.CHAT)
-                .build();
-        channelRepository.save(channelEntity1);
-
-        Channel channelEntity2 = Channel.builder()
-                .category(category2)
-                .channelName("일반")
-                .channelType(ChannelType.VOICE)
-                .build();
-        channelRepository.save(channelEntity2);
-
-        // 반환 DTO
-        // 방 객체
-        RoomCreateWithCCDTO roomCreateWithCCDTO = new RoomCreateWithCCDTO();
-        roomCreateWithCCDTO.setRoomId(room.getRoomId());
-        roomCreateWithCCDTO.setRoomName(room.getRoomName());
-
-        // 채팅 채널 카테고리
-        RoomCreateWithCCDTO.Category categoryDTO1 = new RoomCreateWithCCDTO.Category();
-        categoryDTO1.setCategoryId(category1.getCategoryId());
-        categoryDTO1.setCategoryName(category1.getCategoryName());
-
-        // 음성 채널 카테고리
-        RoomCreateWithCCDTO.Category categoryDTO2 = new RoomCreateWithCCDTO.Category();
-        categoryDTO2.setCategoryId(category2.getCategoryId());
-        categoryDTO2.setCategoryName(category2.getCategoryName());
-
-        // 채팅 채널 카테고리 일반 채널
-        RoomCreateWithCCDTO.Channel category1Channel = new RoomCreateWithCCDTO.Channel();
-        category1Channel.setChannelId(channelEntity1.getChannelId());
-        category1Channel.setChannelName(channelEntity1.getChannelName());
-        category1Channel.setChannelType(ChannelType.CHAT);
-
-        // 음성 채널 카테고리 일반 채널
-        RoomCreateWithCCDTO.Channel category2Channel = new RoomCreateWithCCDTO.Channel();
-        category2Channel.setChannelId(channelEntity2.getChannelId());
-        category2Channel.setChannelName(channelEntity2.getChannelName());
-        category2Channel.setChannelType(ChannelType.VOICE);
-
-        // 각 카테고리에 일반 채널 리스트로 할당
-        categoryDTO1.setChannels(Arrays.asList(category1Channel));
-        categoryDTO2.setChannels(Arrays.asList(category2Channel));
-
-        // 방에 카테고리 리스트로 할당
-        roomCreateWithCCDTO.setCategories(Arrays.asList(categoryDTO1, categoryDTO2));
-
-        return roomCreateWithCCDTO;
+        return roomRepository.save(roomCreateDTO);
     }
 
     // 방 목록
@@ -183,9 +101,7 @@ public class RoomService {
 
     @Transactional
     public RoomRemoveDTO roomRemove(Long roomId) throws ClassNotFoundException {
-        Room room = roomRepository.findByRoomId(roomId).orElseThrow(() -> new ClassNotFoundException("방이 존재하지 않습니다."));
-
-        roomRepository.delete(room);
+        roomRepository.delete(roomId);
         RoomRemoveDTO roomRemoveDTO = new RoomRemoveDTO();
 
         return roomRemoveDTO;

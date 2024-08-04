@@ -44,33 +44,7 @@ public class CategoryService {
 
     @Transactional
     public List<CategoryDetailDTO> categoryList(Long roomId) throws ClassNotFoundException {
-
-        Room room = roomRepository.findByRoomId(roomId).orElseThrow(() -> new ClassNotFoundException("방이 존재하지 않습니다."));
-
-        List<CategoryDetailDTO> categoryDetailDTOs = categoryRepository.findCategoriesByRoom(room).stream()
-                .map(category -> {
-                    CategoryDetailDTO categoryDetailDTO = new CategoryDetailDTO();
-                    categoryDetailDTO.setCategoryName(category.getCategoryName());
-                    categoryDetailDTO.setRoomId(category.getRoom().getRoomId());
-                    categoryDetailDTO.setCategoryId(category.getCategoryId());
-
-                    List<ChannelDetailDTO> channelDetailDTOs = channelRepository.findChannelsByCategory(category).stream()
-                                    .map(channel -> {
-
-                                        ChannelDetailDTO channelDetailDTO = new ChannelDetailDTO();
-                                        channelDetailDTO.setCategoryId(category.getCategoryId());
-                                        channelDetailDTO.setChannelId(channel.getChannelId());
-                                        channelDetailDTO.setChannelName(channel.getChannelName());
-                                        channelDetailDTO.setChannelType(channel.getChannelType());
-
-                                        return channelDetailDTO;
-                                    }).toList();
-
-                    categoryDetailDTO.setChannels(channelDetailDTOs);
-                    return categoryDetailDTO;
-                }).toList();
-
-        return categoryDetailDTOs;
+        return categoryRepository.findCategoriesByRoom(roomId);
     }
 
     @Transactional
