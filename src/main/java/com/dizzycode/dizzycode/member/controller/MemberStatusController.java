@@ -58,6 +58,7 @@ public class MemberStatusController {
         userStatus.put("status", roomMemberStatusDTO.getStatus());
         userStatus.put("lastActive", now.toString());
 
+        log.info("heartbeat={}", "ok");
         redisTemplate.opsForHash().putAll("memberId:" + roomMemberStatusDTO.getMemberId(), userStatus);
     }
 }

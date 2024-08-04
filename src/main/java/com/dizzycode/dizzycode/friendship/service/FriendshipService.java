@@ -1,16 +1,12 @@
 package com.dizzycode.dizzycode.friendship.service;
 
-import com.dizzycode.dizzycode.member.exception.NoMemberException;
 import com.dizzycode.dizzycode.friendship.domain.Friendship;
-import com.dizzycode.dizzycode.friendship.domain.FriendshipId;
 import com.dizzycode.dizzycode.friendship.domain.FriendshipStatus;
 import com.dizzycode.dizzycode.friendship.service.port.FriendshipRepository;
 import com.dizzycode.dizzycode.member.domain.Member;
 import com.dizzycode.dizzycode.friendship.domain.dto.FriendshipDetailDTO;
 import com.dizzycode.dizzycode.friendship.domain.dto.FriendshipRemoveDTO;
 import com.dizzycode.dizzycode.room.domain.room.DMRoomCreateDTO;
-import com.dizzycode.dizzycode.friendship.exception.FriendshipAlreadyExistsException;
-import com.dizzycode.dizzycode.friendship.exception.InvalidFriendshipRequestException;
 import com.dizzycode.dizzycode.member.service.port.MemberRepository;
 import com.dizzycode.dizzycode.message.service.DirectMessageRoomService;
 import jakarta.transaction.Transactional;
@@ -74,28 +70,7 @@ public class FriendshipService {
     // 친구 신청 (id 기반)
     @Transactional
     public FriendshipDetailDTO requestFriendship(Long senderId, Long receiverId) {
-        if (senderId.equals(receiverId)) {
-            throw new InvalidFriendshipRequestException("친구 신청을 보낼 수 없는 대상입니다.");
-        }
-
-        FriendshipId friendshipId1 = new FriendshipId(senderId, receiverId);
-        FriendshipId friendshipId2 = new FriendshipId(receiverId, senderId);
-
-        if (friendshipRepository.existsById(friendshipId1) || friendshipRepository.existsById(friendshipId2)) {
-            throw new FriendshipAlreadyExistsException("친구 관계가 이미 존재합니다.");
-        }
-
-        Member optionalMember1 = memberRepository.findById(senderId).orElseThrow(() -> new NoMemberException("존재하지 않는 회원입니다."));
-        Member optionalMember2 = memberRepository.findById(receiverId).orElseThrow(() -> new NoMemberException("존재하지 않는 회원입니다."));
-
-        Friendship friendship = Friendship.builder()
-                .friendshipId(friendshipId1)
-                .status(FriendshipStatus.PENDING)
-                .member1(optionalMember1)
-                .member2(optionalMember2)
-                .build();
-        friendshipRepository.save(friendship);
-
+        Friendship friendship = friendshipRepository.saveById(senderId, receiverId);
         FriendshipDetailDTO friendshipDetail = new FriendshipDetailDTO();
         friendshipDetail.setFriendId(friendship.getMember2().getId());
         friendshipDetail.setCurrentStatus(friendship.getStatus());
@@ -107,27 +82,7 @@ public class FriendshipService {
     // 친구 요청(username 기반)
     @Transactional
     public FriendshipDetailDTO requestFriendshipByUsername(Long senderId, String username) {
-        Member friend = memberRepository.findByUsername(username).orElseThrow(() -> new NoMemberException("존재하지 않는 회원입니다."));
-        Long friendId = friend.getId();
-        if (senderId.equals(friendId)) {
-            throw new InvalidFriendshipRequestException("친구 신청을 보낼 수 없는 대상입니다.");
-        }
-
-        FriendshipId friendshipId1 = new FriendshipId(senderId, friendId);
-        FriendshipId friendshipId2 = new FriendshipId(friendId, senderId);
-        if (friendshipRepository.existsById(friendshipId1) || friendshipRepository.existsById(friendshipId2)) {
-            throw new FriendshipAlreadyExistsException("친구 관계가 이미 존재합니다.");
-        }
-        Member optionalMember1 = memberRepository.findById(senderId).orElseThrow(() -> new NoMemberException("존재하지 않는 회원입니다."));
-
-        Friendship friendship = Friendship.builder()
-                .friendshipId(friendshipId1)
-                .status(FriendshipStatus.PENDING)
-                .member1(optionalMember1)
-                .member2(friend)
-                .build();
-        friendshipRepository.save(friendship);
-
+        Friendship friendship = friendshipRepository.saveByUsername(senderId, username);
         FriendshipDetailDTO friendshipDetail = new FriendshipDetailDTO();
         friendshipDetail.setFriendId(friendship.getMember2().getId());
         friendshipDetail.setCurrentStatus(friendship.getStatus());
@@ -149,10 +104,7 @@ public class FriendshipService {
     // 친구 요청 수락
     @Transactional
     public FriendshipDetailDTO acceptFriendshipRequest(Long memberId1, Long memberId2) throws ClassNotFoundException {
-        Friendship friendship = friendshipRepository.findFriendshipById(memberId1, memberId2).orElseThrow(() -> new ClassNotFoundException("친구 관계가 존재하지 않습니다."));
-        friendship = friendship.update(FriendshipStatus.ACCEPTED);
-        friendshipRepository.save(friendship);
-
+        Friendship friendship = friendshipRepository.accept(memberId1, memberId2);
         FriendshipDetailDTO friendshipDetail = new FriendshipDetailDTO();
         friendshipDetail.setFriendId(friendship.getMember2().getId());
         friendshipDetail.setCurrentStatus(friendship.getStatus());
@@ -164,7 +116,6 @@ public class FriendshipService {
         usernames.add(friendship.getMember2().getUsername());
         dmRoomCreateDTO.setRoomName("");
         dmRoomCreateDTO.setUserNames(usernames);
-
         directMessageRoomService.createDMRoom(dmRoomCreateDTO);
 
         return friendshipDetail;
@@ -173,9 +124,7 @@ public class FriendshipService {
     // 친구 요청 거절
     @Transactional
     public FriendshipDetailDTO rejectFriendshipRequest(Long memberId1, Long memberId2) throws ClassNotFoundException {
-        Friendship friendship = friendshipRepository.findFriendshipById(memberId1, memberId2).orElseThrow(() -> new ClassNotFoundException("친구 관계가 존재하지 않습니다."));
-        friendship = friendship.update(FriendshipStatus.REJECTED);
-
+        Friendship friendship = friendshipRepository.reject(memberId1, memberId2);
         FriendshipDetailDTO friendshipDetail = new FriendshipDetailDTO();
         friendshipDetail.setFriendId(friendship.getMember2().getId());
         friendshipDetail.setCurrentStatus(friendship.getStatus());
