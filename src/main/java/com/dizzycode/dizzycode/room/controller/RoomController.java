@@ -52,12 +52,6 @@ public class RoomController {
         return new ResponseEntity<>(roomService.roomRemove(roomId), HttpStatus.NO_CONTENT);
     }
 
-    @PostMapping("/rooms/{roomId}/in")
-    public ResponseEntity<RoomMemberDetailDTO> roomIn(@PathVariable Long roomId) throws ClassNotFoundException {
-
-        return new ResponseEntity<>(roomService.roomIn(roomId), HttpStatus.OK);
-    }
-
     @DeleteMapping("/rooms/{roomId}/out")
     public ResponseEntity<Void> roomOut(@PathVariable Long roomId) {
 

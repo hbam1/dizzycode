@@ -1,4 +1,4 @@
-package com.dizzycode.dizzycode.member.service;
+package com.dizzycode.dizzycode.security.service;
 
 import com.dizzycode.dizzycode.member.controller.response.MemberCreateResponse;
 import com.dizzycode.dizzycode.member.domain.Member;
@@ -72,6 +72,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String access = jwtUtil.createJwt("access", email, role, 600000L, id, username);
         String refresh = jwtUtil.createJwt("refresh", email, role, 86400000L, id, username);
 
+        //TODO: member package 안으로 수정
         ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
         valueOperations.set(refresh, email, 86400000L, TimeUnit.MILLISECONDS);
 

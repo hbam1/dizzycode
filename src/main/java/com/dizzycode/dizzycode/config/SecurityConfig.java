@@ -1,9 +1,9 @@
 package com.dizzycode.dizzycode.config;
 
-import com.dizzycode.dizzycode.member.service.CustomLogoutFilter;
+import com.dizzycode.dizzycode.security.service.CustomLogoutFilter;
 import com.dizzycode.dizzycode.common.JWTFilter;
 import com.dizzycode.dizzycode.common.JWTUtil;
-import com.dizzycode.dizzycode.member.service.LoginFilter;
+import com.dizzycode.dizzycode.security.service.LoginFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

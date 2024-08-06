@@ -1,4 +1,4 @@
-package com.dizzycode.dizzycode.member.controller;
+package com.dizzycode.dizzycode.security.controller;
 
 import com.dizzycode.dizzycode.common.JWTUtil;
 import io.jsonwebtoken.ExpiredJwtException;

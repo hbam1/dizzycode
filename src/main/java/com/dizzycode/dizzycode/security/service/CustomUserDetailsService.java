@@ -1,4 +1,4 @@
-package com.dizzycode.dizzycode.member.service;
+package com.dizzycode.dizzycode.security.service;
 
 
 import com.dizzycode.dizzycode.member.exception.NoMemberException;

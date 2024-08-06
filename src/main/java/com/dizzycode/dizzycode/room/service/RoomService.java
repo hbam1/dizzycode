@@ -1,9 +1,6 @@
 package com.dizzycode.dizzycode.room.service;
 
-import com.dizzycode.dizzycode.category.domain.Category;
 import com.dizzycode.dizzycode.category.service.port.CategoryRepository;
-import com.dizzycode.dizzycode.channel.domain.Channel;
-import com.dizzycode.dizzycode.channel.domain.ChannelType;
 import com.dizzycode.dizzycode.channel.service.port.ChannelRepository;
 import com.dizzycode.dizzycode.member.domain.Member;
 import com.dizzycode.dizzycode.member.service.port.MemberRepository;
@@ -27,7 +24,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,8 +37,6 @@ public class RoomService {
     private final RoomRepository roomRepository;
     private final MemberRepository memberRepository;
     private final RoomMemberRepository roomMemberRepository;
-    private final CategoryRepository categoryRepository;
-    private final ChannelRepository channelRepository;
     private final RedisTemplate<String, String> redisTemplate;
 
 
@@ -105,26 +99,6 @@ public class RoomService {
         RoomRemoveDTO roomRemoveDTO = new RoomRemoveDTO();
 
         return roomRemoveDTO;
-    }
-
-    // 방 입장
-    @Transactional
-    public RoomMemberDetailDTO roomIn(Long roomId) throws ClassNotFoundException {
-        Member member = getMemberFromSession();
-        Room room = roomRepository.findByRoomId(roomId).orElseThrow(() -> new ClassNotFoundException("방이 존재하지 않습니다."));
-        RoomMemberId roomMemberId = new RoomMemberId(member.getId(), roomId);
-
-        RoomMember roomMember = RoomMember.builder()
-                .roomMemberId(roomMemberId)
-                .room(room)
-                .member(member)
-                .build();
-        RoomMember save = roomMemberRepository.save(roomMember);
-
-        RoomMemberDetailDTO roomMemberDetailDTO = new RoomMemberDetailDTO();
-        roomMemberDetailDTO.setRoomMemberId(save.getRoomMemberId());
-
-        return roomMemberDetailDTO;
     }
 
     // 방 나가기
