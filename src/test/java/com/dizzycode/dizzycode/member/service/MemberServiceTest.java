@@ -6,7 +6,6 @@ import com.dizzycode.dizzycode.member.exception.ExistMemberException;
 import com.dizzycode.dizzycode.member.service.port.MemberStatusRepository;
 import com.dizzycode.dizzycode.mock.FakeMemberRepository;
 import com.dizzycode.dizzycode.mock.FakeMemberStatusRepository;
-import com.dizzycode.dizzycode.room.domain.room.RoomMemberStatusDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
