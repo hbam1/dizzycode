@@ -19,24 +19,24 @@ public class HeartbeatScheduler {
     private static final DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
 
-    @Scheduled(fixedRate = 5000)
-    public void checkHeartbeat() {
-        Set<String> keys = redisTemplate.keys("memberId:*");
-
-        if (keys != null) {
-            LocalDateTime currentTime = LocalDateTime.now();
-            long thresholdSeconds = 60; // 1분
-
-            for (String key : keys) {
-                String lastActiveStr = (String) redisTemplate.opsForHash().get(key, "lastActive");
-                if (lastActiveStr != null) {
-                    LocalDateTime lastActive = LocalDateTime.parse(lastActiveStr, formatter);
-                    if (lastActive.plusSeconds(thresholdSeconds).isBefore(currentTime)) {
-                        // 상태를 offline으로 변경
-                        redisTemplate.opsForHash().put(key, "status", "offline");
-                    }
-                }
-            }
-        }
-    }
+//    @Scheduled(fixedRate = 5000)
+//    public void checkHeartbeat() {
+//        Set<String> keys = redisTemplate.keys("memberId:*");
+//
+//        if (keys != null) {
+//            LocalDateTime currentTime = LocalDateTime.now();
+//            long thresholdSeconds = 60; // 1분
+//
+//            for (String key : keys) {
+//                String lastActiveStr = (String) redisTemplate.opsForHash().get(key, "lastActive");
+//                if (lastActiveStr != null) {
+//                    LocalDateTime lastActive = LocalDateTime.parse(lastActiveStr, formatter);
+//                    if (lastActive.plusSeconds(thresholdSeconds).isBefore(currentTime)) {
+//                        // 상태를 offline으로 변경
+//                        redisTemplate.opsForHash().put(key, "status", "offline");
+//                    }
+//                }
+//            }
+//        }
+//    }
 }
