@@ -28,7 +28,6 @@ public class FriendshipService {
     // 친구 목록
     @Transactional
     public List<FriendshipDetailDTO> friendshipList(Long memberId) {
-
         List<Friendship> friendships = friendshipRepository.findFriendshipsByMemberId(memberId);
 
         List<FriendshipDetailDTO> friendshipDetailList = friendships.stream().filter(friendship -> friendship.getStatus() == FriendshipStatus.ACCEPTED)

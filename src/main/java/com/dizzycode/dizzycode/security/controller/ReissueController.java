@@ -24,8 +24,7 @@ public class ReissueController {
 
     @PostMapping("/reissue")
     public ResponseEntity<?> reissue(HttpServletRequest request, HttpServletResponse response) {
-
-        // service와 controller logic 분리
+        // TODO:service와 controller logic 분리
 
         //get refresh token
         String refresh = null;

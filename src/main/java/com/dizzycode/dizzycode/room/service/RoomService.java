@@ -1,13 +1,10 @@
 package com.dizzycode.dizzycode.room.service;
 
-import com.dizzycode.dizzycode.category.service.port.CategoryRepository;
-import com.dizzycode.dizzycode.channel.service.port.ChannelRepository;
 import com.dizzycode.dizzycode.member.domain.Member;
 import com.dizzycode.dizzycode.member.service.port.MemberRepository;
 import com.dizzycode.dizzycode.room.domain.Room;
 import com.dizzycode.dizzycode.roommember.domain.RoomMember;
 import com.dizzycode.dizzycode.roommember.domain.RoomMemberId;
-import com.dizzycode.dizzycode.roommember.domain.dto.RoomMemberDetailDTO;
 import com.dizzycode.dizzycode.member.domain.MemberStatus;
 import com.dizzycode.dizzycode.room.domain.room.RoomCreateDTO;
 import com.dizzycode.dizzycode.room.domain.room.RoomCreateWithCCDTO;

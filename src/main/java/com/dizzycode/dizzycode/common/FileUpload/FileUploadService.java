@@ -1,8 +1,6 @@
 package com.dizzycode.dizzycode.common.FileUpload;
 
-import com.dizzycode.dizzycode.common.FileUpload.FileCreateDTO;
 import org.springframework.stereotype.Service;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
