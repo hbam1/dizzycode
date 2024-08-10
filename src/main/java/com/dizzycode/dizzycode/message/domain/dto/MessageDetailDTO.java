@@ -12,5 +12,6 @@ public class MessageDetailDTO {
     private String messageId;
     private String senderUsername;
     private String content;
+    private String url;
     private LocalDateTime timestamp; // 메시지 생성 시간 추가
 }
