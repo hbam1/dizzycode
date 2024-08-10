@@ -1,4 +1,4 @@
-package com.dizzycode.dizzycode.member.trace;
+package com.dizzycode.dizzycode.common.trace;
 
 import lombok.Getter;
 

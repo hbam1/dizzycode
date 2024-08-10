@@ -13,6 +13,7 @@ import com.dizzycode.dizzycode.message.infrastructure.DirectRoomMemberRepository
 import com.dizzycode.dizzycode.member.infrastructure.MemberJpaRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class DirectMessageRoomService {
 
     private final DirectMessageRoomRepository directMessageRoomRepository;
@@ -272,6 +274,9 @@ public class DirectMessageRoomService {
     private MemberEntity getMemberFromSession() {
         // 현재 인증된 사용자의 인증 객체를 가져옴
         String[] memberInfo = SecurityContextHolder.getContext().getAuthentication().getName().split(" ");
+        if (memberInfo.length == 1) {
+            throw new NoMemberException("존재하지 않는 회원입니다.");
+        }
         String email = memberInfo[1];
 
         return memberJpaRepository.findByEmail(email).orElseThrow(() -> new NoMemberException("존재하지 않는 회원입니다."));

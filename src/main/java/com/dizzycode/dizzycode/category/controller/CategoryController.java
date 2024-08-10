@@ -4,6 +4,7 @@ import com.dizzycode.dizzycode.category.domain.dto.CategoryCreateDTO;
 import com.dizzycode.dizzycode.category.domain.dto.CategoryDetailDTO;
 import com.dizzycode.dizzycode.category.domain.dto.CategoryPostResponseDTO;
 import com.dizzycode.dizzycode.category.service.CategoryService;
+import com.dizzycode.dizzycode.room.exception.NoRoomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,13 +18,13 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @PostMapping("/rooms/{roomId}/categories")
-    public ResponseEntity<CategoryPostResponseDTO> createCategory(@RequestBody CategoryCreateDTO categoryCreateDTO, @PathVariable Long roomId) throws ClassNotFoundException {
+    public ResponseEntity<CategoryPostResponseDTO> createCategory(@RequestBody CategoryCreateDTO categoryCreateDTO, @PathVariable Long roomId) throws NoRoomException {
 
         return new ResponseEntity<>(categoryService.createCategory(roomId, categoryCreateDTO), HttpStatus.CREATED);
     }
 
     @GetMapping("/rooms/{roomId}/categories")
-    public ResponseEntity<List<CategoryDetailDTO>> categoryList(@PathVariable Long roomId) throws ClassNotFoundException {
+    public ResponseEntity<List<CategoryDetailDTO>> categoryList(@PathVariable Long roomId) throws NoRoomException {
 
         return new ResponseEntity<>(categoryService.categoryList(roomId), HttpStatus.OK);
     }

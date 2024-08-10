@@ -8,6 +8,7 @@ import com.dizzycode.dizzycode.category.domain.Category;
 import com.dizzycode.dizzycode.channel.service.port.ChannelRepository;
 import com.dizzycode.dizzycode.channel.domain.dto.ChannelDetailDTO;
 import com.dizzycode.dizzycode.room.domain.Room;
+import com.dizzycode.dizzycode.room.exception.NoRoomException;
 import com.dizzycode.dizzycode.room.service.port.RoomRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -20,20 +21,11 @@ import java.util.List;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
-    private final RoomRepository roomRepository;
     private final ChannelRepository channelRepository;
 
     @Transactional
-    public CategoryPostResponseDTO createCategory(Long roomId, CategoryCreateDTO categoryCreateDTO) throws ClassNotFoundException {
-
-        Room room = roomRepository.findByRoomId(roomId).orElseThrow(() -> new ClassNotFoundException("방이 존재하지 않습니다."));
-
-        Category category = Category.builder()
-                .room(room)
-                .categoryName(categoryCreateDTO.getCategoryName())
-                .build();
-        category = categoryRepository.save(category);
-
+    public CategoryPostResponseDTO createCategory(Long roomId, CategoryCreateDTO categoryCreateDTO) throws NoRoomException {
+        Category category = categoryRepository.save(roomId, categoryCreateDTO.getCategoryName());
         CategoryPostResponseDTO categoryPostResponseDTO = new CategoryPostResponseDTO();
         categoryPostResponseDTO.setCategoryId(category.getCategoryId());
         categoryPostResponseDTO.setRoomId(category.getRoom().getRoomId());
@@ -43,7 +35,7 @@ public class CategoryService {
     }
 
     @Transactional
-    public List<CategoryDetailDTO> categoryList(Long roomId) throws ClassNotFoundException {
+    public List<CategoryDetailDTO> categoryList(Long roomId) throws NoRoomException {
         return categoryRepository.findCategoriesByRoom(roomId);
     }
 

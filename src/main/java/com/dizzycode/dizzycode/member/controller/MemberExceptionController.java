@@ -3,12 +3,14 @@ package com.dizzycode.dizzycode.member.controller;
 import com.dizzycode.dizzycode.member.exception.NoMemberException;
 import com.dizzycode.dizzycode.common.exception.ErrorResult;
 import com.dizzycode.dizzycode.member.exception.ExistMemberException;
+import com.dizzycode.dizzycode.message.controller.DirectMessageController;
+import com.dizzycode.dizzycode.room.controller.RoomController;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@RestControllerAdvice(assignableTypes = MemberController.class)
+@RestControllerAdvice(assignableTypes = {MemberController.class, DirectMessageController.class, RoomController.class})
 public class MemberExceptionController {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

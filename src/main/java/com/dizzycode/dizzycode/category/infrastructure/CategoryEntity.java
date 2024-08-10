@@ -43,13 +43,6 @@ public class CategoryEntity {
         return Category.builder()
                 .room(room.toModel())
                 .categoryName(categoryName)
-                .channels(channels.stream()
-                        .map(channelEntity -> {
-                            Channel channel = channelEntity.toModel();
-
-                            return channel;
-                        })
-                        .collect(Collectors.toList()))
                 .build();
     }
 }

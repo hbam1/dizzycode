@@ -1,6 +1,7 @@
 package com.dizzycode.dizzycode.channel.service;
 
 import com.dizzycode.dizzycode.category.domain.Category;
+import com.dizzycode.dizzycode.category.exception.NoCategoryException;
 import com.dizzycode.dizzycode.category.service.port.CategoryRepository;
 import com.dizzycode.dizzycode.channel.domain.Channel;
 import com.dizzycode.dizzycode.channel.service.port.ChannelRepository;
@@ -22,16 +23,7 @@ public class ChannelService {
 
     @Transactional
     public ChannelDetailDTO createChannel(Long categoryId, ChannelCreateDTO channelCreateDTO) {
-        //TODO 예외처리
-        Category category = categoryRepository.findCategoryByCategoryId(categoryId).orElseThrow();
-
-        Channel channel = Channel.builder()
-                .category(category)
-                .channelName(channelCreateDTO.getChannelName())
-                .channelType(channelCreateDTO.getChannelType())
-                .build();
-        channel = channelRepository.save(channel);
-
+        Channel channel = channelRepository.save(categoryId, channelCreateDTO);
         ChannelDetailDTO channelDetailDTO = new ChannelDetailDTO();
         channelDetailDTO.setChannelId(channel.getChannelId());
         channelDetailDTO.setChannelName(channel.getChannelName());

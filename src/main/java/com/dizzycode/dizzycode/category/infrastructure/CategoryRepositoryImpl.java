@@ -5,7 +5,7 @@ import com.dizzycode.dizzycode.category.service.port.CategoryRepository;
 import com.dizzycode.dizzycode.category.domain.Category;
 import com.dizzycode.dizzycode.channel.domain.dto.ChannelDetailDTO;
 import com.dizzycode.dizzycode.channel.infrastructure.ChannelJpaRepository;
-import com.dizzycode.dizzycode.room.domain.Room;
+import com.dizzycode.dizzycode.room.exception.NoRoomException;
 import com.dizzycode.dizzycode.room.infrastructure.RoomEntity;
 import com.dizzycode.dizzycode.room.infrastructure.RoomJpaRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,8 +24,8 @@ public class CategoryRepositoryImpl implements CategoryRepository {
     private final ChannelJpaRepository channelJpaRepository;
 
     @Override
-    public List<CategoryDetailDTO> findCategoriesByRoom(Long roomId) throws ClassNotFoundException {
-        RoomEntity room = roomJpaRepository.findByRoomId(roomId).orElseThrow(() -> new ClassNotFoundException("방이 존재하지 않습니다."));
+    public List<CategoryDetailDTO> findCategoriesByRoom(Long roomId) throws NoRoomException {
+        RoomEntity room = roomJpaRepository.findByRoomId(roomId).orElseThrow(() -> new NoRoomException("방이 존재하지 않습니다."));
 
         return categoryJpaRepository.findCategoriesByRoom(room).stream()
                 .map(category -> {
@@ -58,7 +58,12 @@ public class CategoryRepositoryImpl implements CategoryRepository {
     }
 
     @Override
-    public Category save(Category category) {
-        return categoryJpaRepository.save(CategoryEntity.fromModel(category)).toModel();
+    public Category save(Long roomId, String categoryName) {
+        RoomEntity room = roomJpaRepository.findByRoomId(roomId).orElseThrow(() -> new NoRoomException("방이 존재하지 않습니다."));
+        CategoryEntity category = new CategoryEntity();
+        category.setCategoryName(categoryName);
+        category.setRoom(room);
+
+        return categoryJpaRepository.save(category).toModel();
     }
 }

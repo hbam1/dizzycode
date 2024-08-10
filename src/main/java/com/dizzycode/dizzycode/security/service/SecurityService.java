@@ -31,6 +31,9 @@ public class SecurityService {
     private Member getMemberFromSession() {
         // 현재 인증된 사용자의 인증 객체를 가져옴
         String[] memberInfo = SecurityContextHolder.getContext().getAuthentication().getName().split(" ");
+        if (memberInfo.length == 1) {
+            throw new NoMemberException("존재하지 않는 회원입니다.");
+        }
         String email = memberInfo[1];
         return memberRepository.findByEmail(email).orElseThrow(() -> new NoMemberException("존재하지 않는 회원입니다."));
     }
