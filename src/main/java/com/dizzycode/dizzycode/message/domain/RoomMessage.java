@@ -33,8 +33,8 @@ public class RoomMessage {
     @Field("content")
     private String content;
 
-    @Field("image_url")
-    private String imageUrl;
+    @Field("url")
+    private String url;
 
     @Field("created_at")
     private LocalDateTime createdAt = LocalDateTime.now();

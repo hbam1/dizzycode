@@ -10,7 +10,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -36,6 +38,15 @@ public class FileUploadService {
         return fileName;
     }
 
+    public List<String> storeFiles(List<MultipartFile> files) throws IOException {
+        List<String> fileNames = new ArrayList<>();
+        for (MultipartFile file : files) {
+            String fileName = storeFile(file);
+            fileNames.add(fileName);
+        }
+        return fileNames;
+    }
+
     public String storeBinaryData(FileCreateDTO fileCreateDTO) throws IOException {
         String originalFileName = StringUtils.cleanPath(fileCreateDTO.getFileName());
         String fileExtension = StringUtils.getFilenameExtension(originalFileName);
@@ -44,5 +55,14 @@ public class FileUploadService {
         Path targetLocation = this.fileStorageLocation.resolve(fileName);
         Files.write(targetLocation, decodedBytes);
         return fileName;
+    }
+
+    public List<String> storeBinaryDatas(List<FileCreateDTO> fileCreateDTOs) throws IOException {
+        List<String> fileNames = new ArrayList<>();
+        for (FileCreateDTO fileCreateDTO : fileCreateDTOs) {
+            String fileName = storeBinaryData(fileCreateDTO);
+            fileNames.add(fileName);
+        }
+        return fileNames;
     }
 }

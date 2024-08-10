@@ -30,12 +30,13 @@ public class DirectMessageService {
         directMessage.setContent(content);
         directMessage.setMemberId(senderId);
         directMessage.setMemberUsername(member.orElseThrow().getUsername());
-        directMessage.setImageUrl(messageCreateDTO.getUrl());
+        directMessage.setUrl(messageCreateDTO.getUrl());
         directMessage.setRoomId(roomId);
         DirectMessage newDirectMessage = directMessageRepository.save(directMessage);
 
         MessageDetailDTO messageDetailDTO = new MessageDetailDTO();
         messageDetailDTO.setMessageId(newDirectMessage.getId());
+        messageDetailDTO.setUrl(newDirectMessage.getUrl());
         messageDetailDTO.setContent(newDirectMessage.getContent());
         messageDetailDTO.setTimestamp(newDirectMessage.getCreatedAt());
         messageDetailDTO.setSenderUsername(newDirectMessage.getMemberUsername());
@@ -48,6 +49,7 @@ public class DirectMessageService {
                 .map(message -> {
                     MessageDetailDTO messageDetailDTO = new MessageDetailDTO();
                     messageDetailDTO.setMessageId(message.getId());
+                    messageDetailDTO.setUrl(message.getUrl());
                     messageDetailDTO.setSenderUsername(message.getMemberUsername());
                     messageDetailDTO.setContent(message.getContent());
                     messageDetailDTO.setTimestamp(message.getCreatedAt());

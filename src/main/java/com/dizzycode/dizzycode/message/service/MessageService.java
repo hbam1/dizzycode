@@ -42,7 +42,7 @@ public class MessageService {
         roomMessage.setCategoryId(categoryId);
         roomMessage.setChannelId(channelId);
         roomMessage.setContent(messageCreateDTO.getContent());
-        roomMessage.setImageUrl(messageCreateDTO.getUrl());
+        roomMessage.setUrl(messageCreateDTO.getUrl());
         RoomMessage newRoomMessage = messageRepository.save(roomMessage);
 
         log.info("messageId={}", newRoomMessage.getId());
@@ -50,6 +50,7 @@ public class MessageService {
         // 메시지 디테일 반환 dto
         MessageDetailDTO messageDetailDTO = new MessageDetailDTO();
         messageDetailDTO.setMessageId(newRoomMessage.getId());
+        messageDetailDTO.setUrl(newRoomMessage.getUrl());
         messageDetailDTO.setContent(newRoomMessage.getContent());
         messageDetailDTO.setSenderUsername(member.orElseThrow().getUsername());
         messageDetailDTO.setTimestamp(newRoomMessage.getCreatedAt());
