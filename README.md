@@ -2,6 +2,10 @@
 
 - Dizzycode (Discord 클론)
 
+# 구조도
+
+![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/1a8abfa8-ac9b-4ffe-9113-2e137a4f2e08/bca574c7-e6e7-4dc6-926e-7ea66552ccab/image.png)
+
 # 기술 스택
 
 - Spring
