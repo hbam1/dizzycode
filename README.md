@@ -4,7 +4,8 @@
 
 # 구조도
 
-![](../../../Downloads/image.png)
+<img width="880" alt="image" src="https://github.com/user-attachments/assets/9019fb6e-0a36-453c-a23a-8e1453ae2965">
+
 
 # 기술 스택
 
