@@ -2,6 +2,10 @@
 
 - Dizzycode (Discord 클론)
 
+# 구조도
+
+![](../../../Downloads/image.png)
+
 # 기술 스택
 
 - Spring
