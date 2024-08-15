@@ -22,7 +22,7 @@
 # 주요 서비스 및 기능
 
 - JWT 기반 인증
-- WebSocket과 STOMP를 통한 실시간 채팅
+- WebSocket과 STOMP를 통한 실시간 채팅 (파일 업로드 가능)
 - Openvidu를 사용한 실시간 음성 및 화상 통화
 - Redis와 Websocket을 활용한 실시간 유저 상태 체크
 - 서버 scale out에 따른 로드밸런서(Nginx)와 Message Queue(RabbitMQ) 도입
