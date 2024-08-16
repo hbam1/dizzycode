@@ -1,5 +1,7 @@
 package com.dizzycode.dizzycode.common.FileUpload;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
@@ -18,6 +20,7 @@ import java.util.UUID;
 @Service
 public class FileUploadService {
 
+    private static final Logger log = LoggerFactory.getLogger(FileUploadService.class);
     private final Path fileStorageLocation;
 
     public FileUploadService(@Value("${file.upload-dir}") String uploadDir) {
@@ -30,9 +33,14 @@ public class FileUploadService {
     }
 
     public String storeFile(MultipartFile file) throws IOException {
+
         String originalFileName = StringUtils.cleanPath(file.getOriginalFilename());
         String fileExtension = StringUtils.getFilenameExtension(originalFileName);
-        String fileName = UUID.randomUUID().toString() + (fileExtension != null ? "." + fileExtension : "");
+        String baseFileName = StringUtils.stripFilenameExtension(originalFileName);
+
+        String fileName = baseFileName + "_" + UUID.randomUUID().toString() +
+                (fileExtension != null ? "." + fileExtension : "");
+
         Path targetLocation = this.fileStorageLocation.resolve(fileName);
         Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
         return fileName;
@@ -48,9 +56,14 @@ public class FileUploadService {
     }
 
     public String storeBinaryData(FileCreateDTO fileCreateDTO) throws IOException {
+
         String originalFileName = StringUtils.cleanPath(fileCreateDTO.getFileName());
         String fileExtension = StringUtils.getFilenameExtension(originalFileName);
-        String fileName = UUID.randomUUID().toString() + (fileExtension != null ? "." + fileExtension : "");
+        String baseFileName = StringUtils.stripFilenameExtension(originalFileName);
+
+        String fileName = baseFileName + "_" + UUID.randomUUID().toString() +
+                (fileExtension != null ? "." + fileExtension : "");
+
         byte[] decodedBytes = Base64.getDecoder().decode(fileCreateDTO.getEncodedFile());
         Path targetLocation = this.fileStorageLocation.resolve(fileName);
         Files.write(targetLocation, decodedBytes);
