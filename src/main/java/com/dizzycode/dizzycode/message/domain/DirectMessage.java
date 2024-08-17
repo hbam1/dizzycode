@@ -6,7 +6,7 @@ import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import java.time.LocalDateTime;
-import java.util.UUID;
+import java.util.List;
 
 @Getter
 @Setter
@@ -29,7 +29,7 @@ public class DirectMessage {
     private String content;
 
     @Field("url")
-    private String url;
+    private List<String> url;
 
     @Field("created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
