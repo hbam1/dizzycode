@@ -11,6 +11,7 @@ import com.dizzycode.dizzycode.member.infrastructure.MemberJpaRepository;
 import com.dizzycode.dizzycode.room.domain.Room;
 import com.dizzycode.dizzycode.room.domain.room.RoomCreateDTO;
 import com.dizzycode.dizzycode.room.domain.room.RoomCreateWithCCDTO;
+import com.dizzycode.dizzycode.room.exception.NoRoomException;
 import com.dizzycode.dizzycode.room.service.port.RoomRepository;
 import com.dizzycode.dizzycode.roommember.infrastructure.RoomMemberEntity;
 import com.dizzycode.dizzycode.roommember.infrastructure.RoomMemberIdEntity;
@@ -132,8 +133,8 @@ public class RoomRepositoryImpl implements RoomRepository {
     }
 
     @Override
-    public void delete(Long roomId) throws ClassNotFoundException {
-        RoomEntity room = roomJpaRepository.findByRoomId(roomId).orElseThrow(() -> new ClassNotFoundException("방이 존재하지 않습니다."));
+    public void delete(Long roomId) {
+        RoomEntity room = roomJpaRepository.findByRoomId(roomId).orElseThrow(() -> new NoRoomException("방이 존재하지 않습니다."));
         roomJpaRepository.delete(room);
     }
 

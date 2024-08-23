@@ -4,24 +4,20 @@ import com.dizzycode.dizzycode.member.domain.Member;
 import com.dizzycode.dizzycode.member.service.port.MemberRepository;
 import com.dizzycode.dizzycode.member.service.port.MemberStatusRepository;
 import com.dizzycode.dizzycode.room.domain.Room;
+import com.dizzycode.dizzycode.room.exception.NoRoomException;
 import com.dizzycode.dizzycode.room.infrastructure.RoomIndexer;
 import com.dizzycode.dizzycode.roommember.domain.RoomMember;
-import com.dizzycode.dizzycode.roommember.domain.RoomMemberId;
 import com.dizzycode.dizzycode.member.domain.MemberStatus;
 import com.dizzycode.dizzycode.room.domain.room.RoomCreateDTO;
 import com.dizzycode.dizzycode.room.domain.room.RoomCreateWithCCDTO;
 import com.dizzycode.dizzycode.room.domain.room.RoomDetailDTO;
 import com.dizzycode.dizzycode.room.domain.room.RoomRemoveDTO;
-import com.dizzycode.dizzycode.member.exception.NoMemberException;
 import com.dizzycode.dizzycode.room.service.port.RoomRepository;
 import com.dizzycode.dizzycode.roommember.service.port.RoomMemberRepository;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 
-import org.springframework.web.client.RestTemplate;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -86,9 +82,8 @@ public class RoomService {
     }
 
     @Transactional
-    public RoomDetailDTO roomRetrieve(Long roomId) throws ClassNotFoundException {
-        Room room = roomRepository.findByRoomId(roomId).orElseThrow(() -> new ClassNotFoundException("방이 존재하지 않습니다."));
-
+    public RoomDetailDTO roomRetrieve(Long roomId) {
+        Room room = roomRepository.findByRoomId(roomId).orElseThrow(() -> new NoRoomException("방이 존재하지 않습니다."));
         RoomDetailDTO roomDetailDTO = new RoomDetailDTO();
         roomDetailDTO.setRoomId(roomId);
         roomDetailDTO.setRoomName(room.getRoomName());
@@ -98,7 +93,7 @@ public class RoomService {
     }
 
     @Transactional
-    public RoomRemoveDTO roomRemove(Long roomId) throws ClassNotFoundException {
+    public RoomRemoveDTO roomRemove(Long roomId){
         roomRepository.delete(roomId);
         roomIndexer.deleteRoomIndex(roomId);
         RoomRemoveDTO roomRemoveDTO = new RoomRemoveDTO();
@@ -109,9 +104,7 @@ public class RoomService {
     // 방 나가기
     @Transactional
     public boolean out(Long roomId) {
-        Member member = getMemberFromSession();
-        RoomMemberId roomMemberId = new RoomMemberId(member.getId(), roomId);
-        RoomMember roomMember = roomMemberRepository.findRoomMemberByRoomMemberId(roomMemberId).orElseThrow();
+        RoomMember roomMember = roomMemberRepository.findRoomMemberByRoomMemberId(roomId).orElseThrow();
         roomMemberRepository.delete(roomMember);
 
         return true;
@@ -143,16 +136,5 @@ public class RoomService {
                 .collect(Collectors.toList());
 
         return memberStatuses;
-    }
-
-    private Member getMemberFromSession() {
-        // 현재 인증된 사용자의 인증 객체를 가져옴
-        String[] memberInfo = SecurityContextHolder.getContext().getAuthentication().getName().split(" ");
-        if (memberInfo.length == 1) {
-            throw new NoMemberException("존재하지 않는 회원입니다.");
-        }
-        String email = memberInfo[1];
-
-        return memberRepository.findByEmail(email).orElseThrow(() -> new NoMemberException("존재하지 않는 회원입니다."));
     }
 }

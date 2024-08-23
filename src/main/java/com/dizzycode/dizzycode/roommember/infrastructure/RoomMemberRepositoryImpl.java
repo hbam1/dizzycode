@@ -47,7 +47,8 @@ public class RoomMemberRepositoryImpl implements RoomMemberRepository {
     }
 
     @Override
-    public Optional<RoomMember> findRoomMemberByRoomMemberId(RoomMemberId roomMemberId) {
+    public Optional<RoomMember> findRoomMemberByRoomMemberId(Long roomId) {
+        RoomMemberId roomMemberId = new RoomMemberId(getMemberFromSession().getId(), roomId);
         return roomMemberJpaRepository.findRoomMemberByRoomMemberId(RoomMemberIdEntity.fromModel(roomMemberId)).map(RoomMemberEntity::toModel);
     }
 
