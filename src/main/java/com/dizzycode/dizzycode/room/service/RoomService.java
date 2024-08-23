@@ -15,8 +15,14 @@ import com.dizzycode.dizzycode.room.service.port.RoomRepository;
 import com.dizzycode.dizzycode.roommember.service.port.RoomMemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,11 +42,19 @@ public class RoomService {
     private final RoomMemberRepository roomMemberRepository;
     private final RedisTemplate<String, String> redisTemplate;
 
+    private final RestTemplate restTemplate;
+
+    @Value("${python.server.url}")
+    private String pythonServerUrl;
 
     // 방 생성
     @Transactional
     public RoomCreateWithCCDTO createRoom(RoomCreateDTO roomCreateDTO) {
-        return roomRepository.save(roomCreateDTO);
+        RoomCreateWithCCDTO roomCreateWithCCDTO = roomRepository.save(roomCreateDTO);
+        if (roomCreateWithCCDTO.isOpen()) {
+            addRoomIndex(roomCreateWithCCDTO.getRoomId(), roomCreateWithCCDTO.getRoomName());
+        }
+        return roomCreateWithCCDTO;
     }
 
     // 방 목록
@@ -93,6 +107,7 @@ public class RoomService {
     @Transactional
     public RoomRemoveDTO roomRemove(Long roomId) throws ClassNotFoundException {
         roomRepository.delete(roomId);
+        deleteRoomIndex(roomId);
         RoomRemoveDTO roomRemoveDTO = new RoomRemoveDTO();
 
         return roomRemoveDTO;
@@ -143,6 +158,36 @@ public class RoomService {
                 .collect(Collectors.toList());
 
         return memberStatuses;
+    }
+
+    // 방 이름 벡터 index 생성 요청
+    public void addRoomIndex(Long roomId, String roomName) {
+        String url = pythonServerUrl + "/add_room";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", "application/json");
+        String requestBody = String.format("{\"roomId\": \"%s\", \"roomName\": \"%s\"}", roomId, roomName);
+        HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            log.info("Indexing Failed : roomId={}", roomId);
+        }
+    }
+
+    // 방 이름 벡터 index 삭제 요청
+    public void deleteRoomIndex(Long roomId) {
+        String url = pythonServerUrl + "/delete_room";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", "application/json");
+        String requestBody = String.format("{\"roomId\": \"%s\"}", roomId);
+        HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            log.info("Index Deletion Failed : roomId={}", roomId);
+        }
     }
 
     private Member getMemberFromSession() {
