@@ -46,9 +46,7 @@ public class RoomService {
     // 방 목록
     @Transactional
     public List<RoomDetailDTO> list() {
-        Member member = getMemberFromSession();
-
-        List<RoomDetailDTO> rooms = roomMemberRepository.findRoomsByMemberId(member.getId()).stream()
+        List<RoomDetailDTO> rooms = roomMemberRepository.findRoomsByMemberId().stream()
                 .map(room -> {
                     RoomDetailDTO roomDetailDTO = new RoomDetailDTO();
                     roomDetailDTO.setRoomId(room.getRoomId());

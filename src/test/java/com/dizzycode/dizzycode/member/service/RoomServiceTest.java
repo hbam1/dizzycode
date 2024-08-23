@@ -7,7 +7,6 @@ import com.dizzycode.dizzycode.mock.roommember.FakeRoomMemberRepository;
 import com.dizzycode.dizzycode.room.domain.room.RoomCreateDTO;
 import com.dizzycode.dizzycode.room.domain.room.RoomCreateWithCCDTO;
 import com.dizzycode.dizzycode.room.service.RoomService;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -44,5 +43,17 @@ public class RoomServiceTest {
         assertThat(roomCreateWithCCDTO.getCategories().size()).isEqualTo(2);
         assertThat(roomCreateWithCCDTO.getCategories().get(0).getChannels().size()).isEqualTo(1);
         assertThat(roomCreateWithCCDTO.getCategories().get(1).getChannels().size()).isEqualTo(1);
+    }
+
+    @Test
+    void 속해있는_방_목록() {
+        // given
+        RoomCreateDTO roomCreateDTO = new RoomCreateDTO();
+        roomCreateDTO.setRoomName("test");
+        roomCreateDTO.setOpen(true);
+        RoomCreateWithCCDTO roomCreateWithCCDTO = roomService.createRoom(roomCreateDTO);
+
+        // when
+        roomService.list();
     }
 }

@@ -3,8 +3,6 @@ package com.dizzycode.dizzycode.member.service;
 import com.dizzycode.dizzycode.member.domain.Member;
 import com.dizzycode.dizzycode.member.domain.MemberSignup;
 import com.dizzycode.dizzycode.member.exception.ExistMemberException;
-import com.dizzycode.dizzycode.member.infrastructure.MemberStatusRepositoryImpl;
-import com.dizzycode.dizzycode.member.service.port.MemberStatusRepository;
 import com.dizzycode.dizzycode.mock.member.FakeMemberRepository;
 import com.dizzycode.dizzycode.mock.member.FakeMemberStatusRepository;
 import org.junit.jupiter.api.BeforeEach;

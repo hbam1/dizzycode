@@ -6,13 +6,16 @@ import com.dizzycode.dizzycode.roommember.domain.RoomMember;
 import com.dizzycode.dizzycode.roommember.domain.RoomMemberId;
 import com.dizzycode.dizzycode.roommember.service.port.RoomMemberRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public class FakeRoomMemberRepository implements RoomMemberRepository {
 
+    public List<RoomMember> data = new ArrayList<>();
+
     @Override
-    public List<Room> findRoomsByMemberId(Long memberID) {
+    public List<Room> findRoomsByMemberId() {
         return null;
     }
 

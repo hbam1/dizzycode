@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface RoomMemberRepository {
 
-    List<Room> findRoomsByMemberId(Long memberID);
+    List<Room> findRoomsByMemberId();
     List<Member> findMembersByRoomId(Long roomId);
     Optional<RoomMember> findRoomMemberByRoomMemberId(RoomMemberId roomMemberId);
     RoomMember save(Long roomId) throws ClassNotFoundException;

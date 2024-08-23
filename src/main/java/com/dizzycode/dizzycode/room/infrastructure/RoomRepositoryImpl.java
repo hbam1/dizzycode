@@ -128,7 +128,6 @@ public class RoomRepositoryImpl implements RoomRepository {
         // 방에 카테고리 리스트로 할당
         roomCreateWithCCDTO.setCategories(Arrays.asList(categoryDTO1, categoryDTO2));
 
-
         return roomCreateWithCCDTO;
     }
 

@@ -26,8 +26,8 @@ public class RoomMemberRepositoryImpl implements RoomMemberRepository {
     private final RoomJpaRepository roomJpaRepository;
 
     @Override
-    public List<Room> findRoomsByMemberId(Long memberID) {
-        return roomMemberJpaRepository.findRoomsByMemberId(memberID).stream()
+    public List<Room> findRoomsByMemberId() {
+        return roomMemberJpaRepository.findRoomsByMemberId(getMemberFromSession().getId()).stream()
                 .map(roomEntity -> {
                     Room room = roomEntity.toModel();
                     return room;
