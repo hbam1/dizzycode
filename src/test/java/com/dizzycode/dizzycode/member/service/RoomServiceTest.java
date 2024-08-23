@@ -2,6 +2,7 @@ package com.dizzycode.dizzycode.member.service;
 
 import com.dizzycode.dizzycode.mock.member.FakeMemberRepository;
 import com.dizzycode.dizzycode.mock.member.FakeMemberStatusRepository;
+import com.dizzycode.dizzycode.mock.room.FakeRoomIndexer;
 import com.dizzycode.dizzycode.mock.room.FakeRoomRepository;
 import com.dizzycode.dizzycode.mock.roommember.FakeRoomMemberRepository;
 import com.dizzycode.dizzycode.room.domain.room.RoomCreateDTO;
@@ -20,6 +21,7 @@ public class RoomServiceTest {
     @BeforeEach
     void init() {
         this.roomService = RoomService.builder()
+                .roomIndexer(new FakeRoomIndexer())
                 .roomRepository(new FakeRoomRepository())
                 .memberRepository(new FakeMemberRepository())
                 .roomMemberRepository(new FakeRoomMemberRepository())
