@@ -1,4 +1,4 @@
-package com.dizzycode.dizzycode.mock;
+package com.dizzycode.dizzycode.mock.member;
 
 import com.dizzycode.dizzycode.member.domain.Member;
 import com.dizzycode.dizzycode.member.domain.Role;

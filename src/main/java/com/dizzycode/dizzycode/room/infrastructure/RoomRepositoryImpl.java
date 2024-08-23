@@ -1,12 +1,10 @@
 package com.dizzycode.dizzycode.room.infrastructure;
 
-import com.dizzycode.dizzycode.category.domain.Category;
 import com.dizzycode.dizzycode.category.infrastructure.CategoryEntity;
 import com.dizzycode.dizzycode.category.infrastructure.CategoryJpaRepository;
 import com.dizzycode.dizzycode.channel.domain.ChannelType;
 import com.dizzycode.dizzycode.channel.infrastructure.ChannelEntity;
 import com.dizzycode.dizzycode.channel.infrastructure.ChannelJpaRepository;
-import com.dizzycode.dizzycode.member.domain.Member;
 import com.dizzycode.dizzycode.member.exception.NoMemberException;
 import com.dizzycode.dizzycode.member.infrastructure.MemberEntity;
 import com.dizzycode.dizzycode.member.infrastructure.MemberJpaRepository;
@@ -14,7 +12,6 @@ import com.dizzycode.dizzycode.room.domain.Room;
 import com.dizzycode.dizzycode.room.domain.room.RoomCreateDTO;
 import com.dizzycode.dizzycode.room.domain.room.RoomCreateWithCCDTO;
 import com.dizzycode.dizzycode.room.service.port.RoomRepository;
-import com.dizzycode.dizzycode.roommember.domain.RoomMemberId;
 import com.dizzycode.dizzycode.roommember.infrastructure.RoomMemberEntity;
 import com.dizzycode.dizzycode.roommember.infrastructure.RoomMemberIdEntity;
 import com.dizzycode.dizzycode.roommember.infrastructure.RoomMemberJpaRepository;
@@ -56,11 +53,13 @@ public class RoomRepositoryImpl implements RoomRepository {
     public RoomCreateWithCCDTO save(RoomCreateDTO roomCreateDTO) {
         // 현재 인증된 사용자의 인증 객체
         MemberEntity member = getMemberFromSession();
+
         // 방 생성
         RoomEntity room = new RoomEntity();
         room.setRoomName(roomCreateDTO.getRoomName());
         room.setOpen(roomCreateDTO.isOpen());
         room = roomJpaRepository.save(room);
+
         // 방과 방 주인 설정
         RoomMemberIdEntity roomMemberId = new RoomMemberIdEntity(member.getId(), room.getRoomId());
         RoomMemberEntity roomMember = new RoomMemberEntity();
@@ -69,6 +68,7 @@ public class RoomRepositoryImpl implements RoomRepository {
         roomMember.setMember(member);
         roomMember.setManager(true);
         roomMemberJpaRepository.save(roomMember);
+
         // 카테고리 및 채널 기본 생성 (채팅 카테고리와 음성 카테고리 기본 생성 및 각 카테고리 별 일반 채널 기본 생성)
         CategoryEntity category1 = new CategoryEntity();
         category1.setRoom(room);
@@ -97,6 +97,7 @@ public class RoomRepositoryImpl implements RoomRepository {
         RoomCreateWithCCDTO roomCreateWithCCDTO = new RoomCreateWithCCDTO();
         roomCreateWithCCDTO.setRoomId(room.getRoomId());
         roomCreateWithCCDTO.setRoomName(room.getRoomName());
+        roomCreateWithCCDTO.setOpen(room.isOpen());
 
         // 채팅 채널 카테고리
         RoomCreateWithCCDTO.Category categoryDTO1 = new RoomCreateWithCCDTO.Category();
@@ -112,13 +113,13 @@ public class RoomRepositoryImpl implements RoomRepository {
         RoomCreateWithCCDTO.Channel category1Channel = new RoomCreateWithCCDTO.Channel();
         category1Channel.setChannelId(channel1.getChannelId());
         category1Channel.setChannelName(channel1.getChannelName());
-        category1Channel.setChannelType(ChannelType.CHAT);
+        category1Channel.setChannelType(channel1.getChannelType());
 
         // 음성 채널 카테고리 일반 채널
         RoomCreateWithCCDTO.Channel category2Channel = new RoomCreateWithCCDTO.Channel();
         category2Channel.setChannelId(channel2.getChannelId());
         category2Channel.setChannelName(channel2.getChannelName());
-        category2Channel.setChannelType(ChannelType.VOICE);
+        category2Channel.setChannelType(channel2.getChannelType());
 
         // 각 카테고리에 일반 채널 리스트로 할당
         categoryDTO1.setChannels(Arrays.asList(category1Channel));
