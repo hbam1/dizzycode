@@ -4,6 +4,7 @@ import com.dizzycode.dizzycode.member.domain.Member;
 import com.dizzycode.dizzycode.member.service.port.MemberRepository;
 import com.dizzycode.dizzycode.member.service.port.MemberStatusRepository;
 import com.dizzycode.dizzycode.room.domain.Room;
+import com.dizzycode.dizzycode.room.infrastructure.RoomIndexer;
 import com.dizzycode.dizzycode.roommember.domain.RoomMember;
 import com.dizzycode.dizzycode.roommember.domain.RoomMemberId;
 import com.dizzycode.dizzycode.member.domain.MemberStatus;
@@ -17,6 +18,9 @@ import com.dizzycode.dizzycode.roommember.service.port.RoomMemberRepository;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+
+import org.springframework.web.client.RestTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,11 +40,16 @@ public class RoomService {
     private final MemberRepository memberRepository;
     private final RoomMemberRepository roomMemberRepository;
     private final MemberStatusRepository memberStatusRepository;
+    private final RoomIndexer roomIndexer;
 
     // 방 생성
     @Transactional
     public RoomCreateWithCCDTO createRoom(RoomCreateDTO roomCreateDTO) {
-        return roomRepository.save(roomCreateDTO);
+        RoomCreateWithCCDTO roomCreateWithCCDTO = roomRepository.save(roomCreateDTO);
+        if (roomCreateWithCCDTO.isOpen()) {
+            roomIndexer.addRoomIndex(roomCreateWithCCDTO.getRoomId(), roomCreateWithCCDTO.getRoomName());
+        }
+        return roomCreateWithCCDTO;
     }
 
     // 방 목록
@@ -91,6 +100,7 @@ public class RoomService {
     @Transactional
     public RoomRemoveDTO roomRemove(Long roomId) throws ClassNotFoundException {
         roomRepository.delete(roomId);
+        roomIndexer.deleteRoomIndex(roomId);
         RoomRemoveDTO roomRemoveDTO = new RoomRemoveDTO();
 
         return roomRemoveDTO;
