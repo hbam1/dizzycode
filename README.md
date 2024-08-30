@@ -50,6 +50,8 @@ SPRING_RESOURCES_STATIC_LOCATIONS=classpath:/static/,file:uploads/
 SPRING_SERVLET_MULTIPART_LOCATION=uploads
 ```
 
+## 실행
+
 ```bash
 git clone https://github.com/hbam1/dizzycode.git
 docker-compose up -d
