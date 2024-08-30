@@ -31,6 +31,25 @@
 
 # 프로젝트 실행
 
+## 환경설정
+```bash
+FILE_UPLOAD_DIR=./uploads
+OPENVIDU_SECRET=secret
+OPENVIDU_URL=http://localhost:4443
+SERVER_PORT=8081
+SPRING_DATA_MONGODB_URI=mongodb+srv://admin:password1234@dizzycode.pg2ff.mongodb.net/dizzycode?retryWrites=true&w=majority&appName=Dizzycode
+SPRING_DATA_REDIS_HOST=localhost
+SPRING_DATASOURCE_PASSWORD=password
+SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/dizzycode?useSSL=false&useUnicode=true&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
+SPRING_DATASOURCE_USERNAME=admin
+SPRING_JWT_SECRET=vmfhaltmskdlstkfkdgodyroqkfwkdbalroqkfwkdbalaaaaaaaaaaaaaaaabbbbbcccccc
+SPRING_RABBITMQ_HOST=localhost
+SPRING_RABBITMQ_PASSWORD=guest
+SPRING_RABBITMQ_USERNAME=guest
+SPRING_RESOURCES_STATIC_LOCATIONS=classpath:/static/,file:uploads/
+SPRING_SERVLET_MULTIPART_LOCATION=uploads
+```
+
 ```bash
 git clone https://github.com/hbam1/dizzycode.git
 docker-compose up -d
