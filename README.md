@@ -80,6 +80,73 @@ npm run dev
 - Clean Architecture와 Hexagonal Architecture를 참고하여 도메인 중심으로 패키지 구조 개선 후 DB에 대한 의존성을 낮춤
 - unit test가 보다 수월해졌고, 보다 도메인 중심 서비스에 충실해짐
 
+#### test code 예시
+
+```bash
+@Test
+void 이메일이_같은_회원_가입_불갸() {
+    // given
+    MemberSignup memberGiven = new MemberSignup();
+    memberGiven.setEmail("test@test.com");
+    memberGiven.setUsername("test1");
+    memberGiven.setPassword("password");
+    memberService.signUp(memberGiven);
+
+    // when
+    MemberSignup memberSignup = new MemberSignup();
+    memberSignup.setEmail("test@test.com");
+    memberSignup.setUsername("test2");
+    memberSignup.setPassword("password");
+
+    // then
+    assertThatThrownBy(() -> {
+        memberService.signUp(memberGiven);
+    }).isInstanceOf(ExistMemberException.class);
+}
+```
+
+# 성능 테스트
+
+## 1. Websocket, STOMP 연결 시 병목 지점 확인
+
+### Test
+
+![img_1.png](img_1.png)
+
+- 사용자 연결 시 서버 측 부하 지점 확인
+- Spring 서버와 RabbitMQ 중 RabbitMQ에 걸리는 부하가 성능 문제 야기
+- 연결 후 메시지 발행까지 과정이 하나씩 진행될 때마다 RabbitMQ의 응답속도 저하 확인
+
+### 성능 개선 확인
+
+![img_2.png](img_2.png)
+
+- 메모리 512MB 할당 시
+  - Average: 평균 3826ms
+  - Std. Dev.(표준편차): 평균 3682ms
+- 메모리 1024MB 할당 시
+  - Average: 평균 2379ms
+  - Std. Dev.(표준편차): 평균 1894ms
+
+#### 결론
+
+- Average의 평균은 약 1.6배, Std. Dev.(표준편차)의 평균은 약 1.9배 가량 빨라짐
+
+## 2. 메시지 read
+
+### Test
+
+![img_3.png](img_3.png)
+
+- 저장된 메시지가 많으면 특정의 방의 메시지를 읽을 때 응답 속도 저하 예상
+- 유의미한 속도 저하 시에는 index를 활용할 계획
+- 각각 1만 개, 10만 개의 데이터가 있을 때 읽기 속도 차이 확인
+- 그 결과, 각각 Average가 10ms, 57ms로, 느려지기는 하지만 큰 성능 저하는 나타나지 않음
+
+#### 결론
+
+- index 설정을 할 때의 trade off도 존재하기 때문에, 속도 저하가 크지 않을 때는 도입 이유가 없다고 판단
+
 # 추가 사항
 
 ### 프론트 엔드
