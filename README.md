@@ -26,6 +26,7 @@
 - Redis와 Websocket을 활용한 실시간 유저 상태 체크
 - 서버 scale out에 따른 로드밸런서(Nginx)와 Message Queue(RabbitMQ) 도입
 - 주요 도메인 관련 데이터는 MySQL에 저장하고, 채팅 관련 데이터는 쉽게 scale out 할 수 있는 MongoDB에 저장
+- 채널 검색 기능을 위해 Flask로 AI 서버 도입
 - API는 Swagger를 통해 문서화
 
 # 프로젝트 실행

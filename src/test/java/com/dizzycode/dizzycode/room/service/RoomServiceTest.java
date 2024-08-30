@@ -1,4 +1,4 @@
-package com.dizzycode.dizzycode.member.service;
+package com.dizzycode.dizzycode.room.service;
 
 import com.dizzycode.dizzycode.member.domain.Member;
 import com.dizzycode.dizzycode.member.domain.Role;
