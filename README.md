@@ -4,7 +4,7 @@
 
 # 구조도
 
-![](../../../Downloads/Group 8.png)
+![img.png](img.png)
 
 # 기술 스택
 
